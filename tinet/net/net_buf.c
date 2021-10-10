@@ -225,7 +225,23 @@ static T_NET_BUF_ENTRY net_buf_table[] = {
 		},
 #endif	/* of #if defined(NUM_MPF_NET_BUF_128) && NUM_MPF_NET_BUF_128 > 0 */
 
-#if defined(_IP4_CFG)
+#if defined(_IP6_CFG)
+
+#if defined(NUM_MPF_NET_BUF_CSEG) && NUM_MPF_NET_BUF_CSEG > 0
+	{
+		MPF_NET_BUF_CSEG,
+		IF_HDR_SIZE + IP_HDR_SIZE + TCP_HDR_SIZE,
+
+#if NET_COUNT_ENABLE & PROTO_FLG_NET_BUF
+
+		NUM_MPF_NET_BUF_CSEG,
+
+#endif	/* of #if NET_COUNT_ENABLE & PROTO_FLG_NET_BUF */
+
+		},
+#endif	/* of #if defined(NUM_MPF_NET_BUF_CSEG) && NUM_MPF_NET_BUF_CSEG > 0 */
+
+#endif	/* of #if defined(_IP6_CFG) */
 
 #if defined(NUM_MPF_NET_BUF_64) && NUM_MPF_NET_BUF_64 > 0
 	{
@@ -241,7 +257,7 @@ static T_NET_BUF_ENTRY net_buf_table[] = {
 		},
 #endif	/* of #if defined(NUM_MPF_NET_BUF_64) && NUM_MPF_NET_BUF_64 > 0 */
 
-#endif	/* of #if defined(_IP4_CFG) */
+#if defined(_IP4_CFG) && !defined(_IP6_CFG)
 
 #if defined(NUM_MPF_NET_BUF_CSEG) && NUM_MPF_NET_BUF_CSEG > 0
 	{
@@ -256,6 +272,8 @@ static T_NET_BUF_ENTRY net_buf_table[] = {
 
 		},
 #endif	/* of #if defined(NUM_MPF_NET_BUF_CSEG) && NUM_MPF_NET_BUF_CSEG > 0 */
+
+#endif	/* of #if defined(_IP4_CFG) && !defined(_IP6_CFG) */
 
 	};
 
@@ -306,7 +324,7 @@ tget_net_buf_up (T_NET_BUF **buf, uint_t minlen, uint_t maxlen, TMO tmout)
 	NET_COUNT_NET_BUF(net_buf_table[req_ix].requests, 1);
 
 	while (1) {
-		if ((error = tget_mpf((ID)net_buf_table[ix].index, (void*)buf, ix == 0 ? tmout : TMO_POL)) == E_OK) {
+		if ((error = tget_mpf((ID)net_buf_table[ix].index, (void **)buf, ix == 0 ? tmout : TMO_POL)) == E_OK) {
 			(*buf)->idix  = (uint8_t)ix;
 			(*buf)->len   = (uint16_t)minlen;
 			(*buf)->flags = 0;
@@ -317,9 +335,9 @@ tget_net_buf_up (T_NET_BUF **buf, uint_t minlen, uint_t maxlen, TMO tmout)
 #endif
 			return error;
 			}
-		else if (ix == 0 || net_buf_table[ix].size > maxlen)
-			break;
 		ix --;
+		if (ix < 0 || net_buf_table[ix].size > maxlen)
+			break;
 		}
 
 	syslog(LOG_WARNING, "[BUF] busy, up   index:%d,%d[%4d], len:%4d.",
@@ -348,7 +366,7 @@ tget_net_buf_down (T_NET_BUF **buf, uint_t minlen, uint_t maxlen, TMO tmout)
 	NET_COUNT_NET_BUF(net_buf_table[req_ix].requests, 1);
 
 	while (1) {
-		if ((error = tget_mpf((ID)net_buf_table[ix].index, (void*)buf,
+		if ((error = tget_mpf((ID)net_buf_table[ix].index, (void **)buf,
 		                      ix == sizeof(net_buf_table) / sizeof(T_NET_BUF_ENTRY) - 1 ? tmout : TMO_POL)) == E_OK) {
 			(*buf)->idix  = (uint8_t)ix;
 			(*buf)->len   = net_buf_table[ix].size;
@@ -449,11 +467,12 @@ rel_net_buf (T_NET_BUF *buf)
 
 		/* 固定メモリプールに返す。*/
 
+		int idix = buf->idix;
 #if NET_COUNT_ENABLE & PROTO_FLG_NET_BUF
-		net_buf_table[buf->idix].busies --;
+		net_buf_table[idix].busies --;
 #endif
-		if ((error = rel_mpf((ID)net_buf_table[buf->idix].index, buf)) != E_OK) {
-			syslog(LOG_WARNING, "[NET BUF] %s, ID=%d.", itron_strerror(error), buf->idix);
+		if ((error = rel_mpf((ID)net_buf_table[idix].index, buf)) != E_OK) {
+			syslog(LOG_WARNING, "[NET BUF] %s, ID=%d.", itron_strerror(error), idix);
 			}
 		}
 	return error;
