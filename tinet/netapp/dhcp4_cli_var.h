@@ -163,7 +163,7 @@ typedef struct dhcp4_cli_context {
 					/* タイマー配列			*/
 	RELTIM		interval;	/* 送信間隔			*/
 	ER_UINT		error;		/* エラー・データ長		*/
-	ID		cepid;		/* CEP ID			*/
+	ID			cepid;		/* CEP ID			*/
 	uint32_t	xid;		/* トランザクション ID		*/
 	uint16_t	flags;		/* 各種フラグ			*/
 	uint16_t	max_prefer;	/* 受信メッセージの最大推奨度	*/

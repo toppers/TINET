@@ -429,7 +429,7 @@ icmp_error (uint8_t code, T_NET_BUF *input)
 
 	/* エラーが発生した IP ヘッダと データ 8 オクテットをコピーする。*/
 	memcpy(GET_ICMP4_SDU(output, IF_IP4_ICMP4_HDR_OFFSET),
-	       GET_IP4_HDR(input), (size_t)(ip4hl + len));
+		GET_IP4_HDR(input), (size_t)(ip4hl + len));
 
 	/* 4 オクテット境界のデータ長 */
 	align = (len + 3) >> 2 << 2;

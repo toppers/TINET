@@ -998,11 +998,11 @@ nd6_rs_output (void)
 	                     IPV6_MAXHLIM, NBA_SEARCH_ASCENT, TMO_ND6_RS_OUTPUT) != E_OK)
 		return;
 
- 	/* ルータ要請ヘッダを設定する。*/
- 	rsh = GET_ROUTER_SOLICIT_HDR(output, IF_IP6_ROUTER_SOLICIT_HDR_OFFSET);
- 	rsh->hdr.type       = ND_ROUTER_SOLICIT;
- 	rsh->hdr.code       = 0;
- 	rsh->nd_rs_reserved = 0;
+	/* ルータ要請ヘッダを設定する。*/
+	rsh = GET_ROUTER_SOLICIT_HDR(output, IF_IP6_ROUTER_SOLICIT_HDR_OFFSET);
+	rsh->hdr.type       = ND_ROUTER_SOLICIT;
+	rsh->hdr.code       = 0;
+	rsh->nd_rs_reserved = 0;
 
 	/* チェックサムを計算する。*/
 	rsh->hdr.sum = 0;

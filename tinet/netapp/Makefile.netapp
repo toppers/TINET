@@ -190,7 +190,7 @@ ifeq ($(USE_UDP_ECHO_CLI),true)
 				NETAPP_KERNEL_CFG := $(NETAPP_KERNEL_CFG) $(NETAPP_DIR)/udp4_echo_cli.cfg
 			endif
 		endif
-        else
+		else
 		ifeq ($(SUPPORT_INET4),true)
 			SUPPORT_UDP = true
 			USE_NETAPP_SUBR = true

@@ -307,9 +307,8 @@ UDP_CRE_CEP (ID cepid, T_UDPN_CCEP *pk_ccep)
 			error = UDP_ALLOC_AUTO_PORT(cep);
 		else 
 			error = UDP_ALLOC_PORT(cep, pk_ccep->myaddr.portno);
-		
-                if (error == E_OK) {
 
+		if (error == E_OK) {
 			/* UDP 通信端点生成情報をコピーする。*/
 			cep->cepatr        = pk_ccep->cepatr;			/* 通信端点属性		*/
 			cep->myaddr.ipaddr = pk_ccep->myaddr.ipaddr;		/* 自分のアドレス	*/

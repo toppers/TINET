@@ -135,7 +135,7 @@
 					?IN6_ARE_ADDR_EQUAL(&GET_IP6_HDR(nbuf)->dst,&GET_IP6_HDR(nbuf)->src)	\
 					:IN4_ARE_ADDR_EQUAL(&GET_IP4_HDR(nbuf)->dst,&GET_IP4_HDR(nbuf)->src))
 #define IN_ARE_NET_SRCADDR_EQUAL(ipaddr,nbuf)	\
-		    			inn_are_net_srcaddr_equal(ipaddr,nbuf)
+						inn_are_net_srcaddr_equal(ipaddr,nbuf)
 #define IN_COPY_TO_HOST(dst,nbuf)	inn_copy_to_host(dst,nbuf)
 #define IN_GET_DATAGRAM(nbuf,len,maxlen,dst,src,next,hlim,nbatr,tmout)	\
 					inn_get_datagram(nbuf,len,maxlen,dst,src,next,hlim,nbatr,tmout)

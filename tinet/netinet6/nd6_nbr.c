@@ -272,14 +272,14 @@ nd6_ns_input (T_NET_BUF *input, uint_t off)
 
 	/* 近隣探索オプションのオフセットを記録する。*/
 	if (nd6_options(nd_opt_off, input->buf + (off + NEIGHBOR_SOLICIT_HDR_SIZE),
-	                            input->len - (off + NEIGHBOR_SOLICIT_HDR_SIZE)) != E_OK)
+								input->len - (off + NEIGHBOR_SOLICIT_HDR_SIZE)) != E_OK)
 		goto err_ret;
 
 	/* 近隣探索オプション (始点リンクアドレス) */
 	if (nd_opt_off[ND_OPT_OFF_ARRAY_IX(ND_OPT_SOURCE_LINKADDR)]) {
 		opth = (T_ND_OPT_HDR *)((uint8_t *)(input->buf + off + NEIGHBOR_SOLICIT_HDR_SIZE) +
-		                        nd_opt_off[ND_OPT_OFF_ARRAY_IX(ND_OPT_SOURCE_LINKADDR)] - 8);
-	 	/* 注意: オプションオフセット配列には、オフセット + 8 が設定されている。*/
+								nd_opt_off[ND_OPT_OFF_ARRAY_IX(ND_OPT_SOURCE_LINKADDR)] - 8);
+		/* 注意: オプションオフセット配列には、オフセット + 8 が設定されている。*/
 		lladdr     = (uint8_t *)(opth + 1);
 		lladdr_len = (opth->len << 3);
 		}
@@ -361,7 +361,7 @@ err_ret:
 
 void
 nd6_ns_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
-               const T_IN6_ADDR *taddr, T_LLINFO_ND6 *ln, bool_t dad)
+			   const T_IN6_ADDR *taddr, T_LLINFO_ND6 *ln, bool_t dad)
 {
 	T_NEIGHBOR_SOLICIT_HDR	*nsh;
 	T_NET_BUF		*output;
@@ -391,8 +391,8 @@ nd6_ns_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 
 	/* ネットワークバッファを獲得し、IPv6 ヘッダを設定する。*/
 	if (in6_get_datagram(&output, len, 0, daddr, NULL,
-	                     IPPROTO_ICMPV6, IPV6_MAXHLIM,
-	                     NBA_SEARCH_ASCENT, TMO_ND6_NS_OUTPUT) != E_OK)
+						 IPPROTO_ICMPV6, IPV6_MAXHLIM,
+						 NBA_SEARCH_ASCENT, TMO_ND6_NS_OUTPUT) != E_OK)
 		return;
 
 	ip6h = GET_IP6_HDR(output);
@@ -447,12 +447,12 @@ nd6_ns_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 		memset(&ip6h->src, 0, sizeof(T_IN6_ADDR));
 		}
 
- 	/* 近隣要請ヘッダを設定する。*/
- 	nsh = GET_NEIGHBOR_SOLICIT_HDR(output, IF_IP6_NEIGHBOR_SOLICIT_HDR_OFFSET);
- 	nsh->hdr.type        = ND_NEIGHBOR_SOLICIT;
- 	nsh->hdr.code        = 0;
- 	nsh->hdr.data.data32 = 0;
- 	nsh->target          = *taddr;
+	/* 近隣要請ヘッダを設定する。*/
+	nsh = GET_NEIGHBOR_SOLICIT_HDR(output, IF_IP6_NEIGHBOR_SOLICIT_HDR_OFFSET);
+	nsh->hdr.type        = ND_NEIGHBOR_SOLICIT;
+	nsh->hdr.code        = 0;
+	nsh->hdr.data.data32 = 0;
+	nsh->target          = *taddr;
 
 	if (!dad && (mac = IF_SOFTC_TO_IFADDR(ifp->ic)) != NULL) {
 
@@ -474,7 +474,7 @@ nd6_ns_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 
 	/* 送信する。*/
 	NET_COUNT_ICMP6(net_count_nd6[NC_ICMP6_OUT_OCTETS],
-	               output->len - GET_IF_IP6_HDR_SIZE(output));
+				   output->len - GET_IF_IP6_HDR_SIZE(output));
 	NET_COUNT_ICMP6(net_count_nd6[NC_ICMP6_OUT_PACKETS], 1);
 	NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpOutMsgs, 1);
 	NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpOutNeighborSolicits, 1);
@@ -520,19 +520,19 @@ nd6_na_input (T_NET_BUF *input, uint_t off)
 
 	/* 近隣要請への応答で、宛先アドレスがマルチキャストならエラー */
 	if ((nah->nd_na_flags_reserved & ND_NA_FLG_SOLICITED) &&
-	    IN6_IS_ADDR_MULTICAST(&ip6h->dst))
+		IN6_IS_ADDR_MULTICAST(&ip6h->dst))
 		goto err_ret;
 
 	/* 近隣探索オプションのオフセットを記録する。*/
 	if (nd6_options(nd_opt_off, input->buf + (off + NEIGHBOR_ADVERT_HDR_SIZE), 
-	                            input->len - (off + NEIGHBOR_ADVERT_HDR_SIZE)) != E_OK)
+								input->len - (off + NEIGHBOR_ADVERT_HDR_SIZE)) != E_OK)
 		goto err_ret;
 
 	/* 近隣探索オプション (目的リンクアドレス) */
 	if (nd_opt_off[ND_OPT_OFF_ARRAY_IX(ND_OPT_TARGET_LINKADDR)]) {
 		opth = (T_ND_OPT_HDR *)((uint8_t *)(input->buf + off + NEIGHBOR_ADVERT_HDR_SIZE) +
-		                        nd_opt_off[ND_OPT_OFF_ARRAY_IX(ND_OPT_TARGET_LINKADDR)] - 8);
-	 	/* 注意: オプションオフセット配列には、オフセット + 8 が設定されている。*/
+								nd_opt_off[ND_OPT_OFF_ARRAY_IX(ND_OPT_TARGET_LINKADDR)] - 8);
+		/* 注意: オプションオフセット配列には、オフセット + 8 が設定されている。*/
 		lladdr     = (uint8_t *)(opth + 1);
 		lladdr_len = (opth->len << 3);
 		}
@@ -627,8 +627,8 @@ nd6_na_input (T_NET_BUF *input, uint_t off)
 			goto free_ret;
 			}
 		else if ((nah->nd_na_flags_reserved & ND_NA_FLG_OVERRIDE) ||						/* (2a) */
-		         ((nah->nd_na_flags_reserved & ND_NA_FLG_OVERRIDE) == 0 && (lladdr != NULL && !llchange)) ||	/* (2b) */
-		         lladdr == NULL) {										/* (2c) */
+				 ((nah->nd_na_flags_reserved & ND_NA_FLG_OVERRIDE) == 0 && (lladdr != NULL && !llchange)) ||	/* (2b) */
+				 lladdr == NULL) {										/* (2c) */
 
 			/* データリンク層のアドレスが通知されていれば更新する。*/
 			if (lladdr != NULL)
@@ -656,7 +656,7 @@ nd6_na_input (T_NET_BUF *input, uint_t off)
 
 		/* ルータ通知フラグの処理 */
 		if ((ln->flags        & ND6_LLIF_ROUTER ) != 0 &&
-		    (nah->nd_na_flags_reserved & ND_NA_FLG_ROUTER) == 0) {
+			(nah->nd_na_flags_reserved & ND_NA_FLG_ROUTER) == 0) {
 			/*
 			 *  送信相手がルータ通知フラグを無効にした場合。
 			 *  ディフォルト・ルータリストから対象のルータを削除し、
@@ -697,7 +697,7 @@ err_ret:
 
 void
 nd6_na_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
-               const T_IN6_ADDR *taddr, uint32_t flags, bool_t tlladdr)
+			   const T_IN6_ADDR *taddr, uint32_t flags, bool_t tlladdr)
 {
 	T_NEIGHBOR_ADVERT_HDR	*nah;
 	T_NET_BUF		*output;
@@ -726,8 +726,8 @@ nd6_na_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 
 	/* ネットワークバッファを獲得し、IPv6 ヘッダを設定する。*/
 	if (in6_get_datagram(&output, len, 0, daddr, NULL,
-	                     IPPROTO_ICMPV6, IPV6_MAXHLIM,
-	                     NBA_SEARCH_ASCENT, TMO_ND6_NA_OUTPUT) != E_OK)
+						 IPPROTO_ICMPV6, IPV6_MAXHLIM,
+						 NBA_SEARCH_ASCENT, TMO_ND6_NA_OUTPUT) != E_OK)
 		return;
 
 	ip6h = GET_IP6_HDR(output);
@@ -756,11 +756,11 @@ nd6_na_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 		}
 	ip6h->src = ifa->addr;
 
- 	/* 近隣通知ヘッダを設定する。*/
- 	nah = GET_NEIGHBOR_ADVERT_HDR(output, IF_IP6_NEIGHBOR_ADVERT_HDR_OFFSET);
- 	nah->hdr.type        = ND_NEIGHBOR_ADVERT;
- 	nah->hdr.code        = 0;
- 	nah->target          = *taddr;
+	/* 近隣通知ヘッダを設定する。*/
+	nah = GET_NEIGHBOR_ADVERT_HDR(output, IF_IP6_NEIGHBOR_ADVERT_HDR_OFFSET);
+	nah->hdr.type        = ND_NEIGHBOR_ADVERT;
+	nah->hdr.code        = 0;
+	nah->target          = *taddr;
 
 	/* tlladdr が真ならネットワークインタフェースのアドレスを追加する。*/
 	if (tlladdr && (mac = IF_SOFTC_TO_IFADDR(ifp->ic)) != NULL) {
@@ -786,7 +786,7 @@ nd6_na_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 
 	/* 送信する。*/
 	NET_COUNT_ICMP6(net_count_nd6[NC_ICMP6_OUT_OCTETS],
-	               output->len - GET_IF_IP6_HDR_SIZE(output));
+				   output->len - GET_IF_IP6_HDR_SIZE(output));
 	NET_COUNT_ICMP6(net_count_nd6[NC_ICMP6_OUT_PACKETS], 1);
 	NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpOutMsgs, 1);
 	NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpOutNeighborAdvertisements, 1);
