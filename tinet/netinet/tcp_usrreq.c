@@ -896,7 +896,7 @@ tcp_rel_buf (ID cepid, int_t len)
 	TCP_DROP_RWBUF(cep, (uint_t)len);
 
 	/* tcp_rcv_buf の割当て長をリセットする。*/
-	cep->rcv_buf_len = 0;
+	cep->rcv_buf_len -= len;
 
 	/* 通信端点のロックを解除する。*/
 	syscall(sig_sem(cep->semid_lock));
