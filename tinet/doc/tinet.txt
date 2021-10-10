@@ -1,0 +1,2050 @@
+                  TCP/IP プロトコルスタック（TINET）
+            ユーザズマニュアル（リリース 1.7）［2017/4/5］
+
+1.  TCP/IP プロトコルスタック（TINET）の概要
+
+  TINET は、TOPPERS/ASP と TOPPERS/JSP 用の IPv6/IPv4 デュアルスタック
+の TCP/IP プロトコルスタックである。
+
+1. 1  機能一覧
+
+  以下に、TINET リリース 1.7 の機能一覧を示す。
+
+   (1)   API
+
+         ・ITRON TCP/IP API 仕様の標準機能
+         ・暫定的な ITRON TCP/IP（バージョン 6）API 仕様の標準機能
+         ・ITRON TCP/IP API 仕様の拡張機能
+
+   (2)   TCP
+
+         ・BSD の通信機能
+         ・最大セグメントサイズ（MSS）オプション
+         ・省コピー API
+         ・ノンブロッキングコール（組込み選択可）
+         ・タスクからの Time Wait 状態の TCP 通信端点分離機能（組込み
+           選択可）
+         ・送受信ウィンドバッファの省コピー機能（組込み選択可）
+         ・TCP ヘッダのトレース出力機能（組込み選択可）
+
+   (3)   UDP
+
+         ・ノンブロッキングコール（組込み選択可）
+
+   (4)   近隣探索
+
+         ・近隣探索要請の送受信
+         ・近隣探索通知の送受信
+         ・ルータ通知メッセージの受信
+         ・ルータ要請メッセージの送信
+         ・アドレス重複検出機能
+
+   (5)   ICMPv6
+
+         ・エコー要求・応答の送受信
+         ・エラーの送信（組込み選択可）
+         ・向け直しメッセージの受信（組込み選択可）
+         ・Path MTU
+
+   (6)   ICMPv4
+
+         ・エコー要求・応答の送受信
+         ・エラーの送信（組込み選択可）
+         ・向け直しメッセージの受信（組込み選択可）
+
+   (7)   IPv6
+
+         ・アドレスの自動設定
+         ・静的経路表
+         ・非 PC 系ディジタル機器への適用に向けた IPv6 最小要求仕様の
+           IPv6 最小ホスト仕様に準拠
+         ・拡張ヘッダのエラーの通知
+         ・断片ヘッダ（組込み選択可）
+         ・ホスト情報キャッシュ（組込み選択可）
+         ・IPv6/IPv4 完全デュアルスタック【リリース 1.7 新規】
+         ・IPv4 射影アドレス（組込み選択可）【リリース 1.7 新規】
+
+   (8)   IPv4
+
+         ・静的経路表
+         ・IP データグラムの分割・再構成（組込み選択可）
+         ・IPSEC（組込み選択可、フックのみ実装）
+
+   (9)   その他
+
+         ・ARP 要求・応答の送受信
+         ・ARP での IPv4 アドレス重複検出機能
+         ・DHCP への対応
+         ・SNMP 用管理情報ベース（MIB）の提供
+
+1. 2  制限事項
+
+  以下に、TINET リリース 1.7 の制約事項を述べる。
+
+   (1)   IPv6 では、ネットワークインタフェースはイーサネットのみ選択できる。
+   (2)   IPv6 では、TCP と UDP の両方を選択するか、 どちらか一つを選択
+         しなければならない。 また、UDP のみを選択した場合は、ノンブロッ
+         キング機能を組み込む必要がある。
+   (3)   ノンブロッキングコールにおいても、 通信端点の排他制御のため、
+         短時間であるがブロックすることがある。 
+   (4)   IPv6 に関する ITRON TCP/IP API 2.0 仕様には未対応である。
+         TINET リリース 1.2 からの暫定的な ITRON TCP/IP（バージョン 6）
+         API 仕様にのみ対応している。
+   (5)   ITRON TCP/IP API 部分のライブラリ化は行われているが、ライブラ
+         リとアプリケーションプログラムを別々に構築しておき、 後でリン
+         クする方法はサポートしていない。
+   (6)   設定と読出し可能な TCP 通信端点オプションは無いため、TCP 通信
+         端点オプションの設定 API と読出し API の戻り値は E_PAR である。
+   (7)   設定と読出し可能な UDP 通信端点オプションは無いため、UDP 通信
+         端点オプションの設定 API と読出し API の戻り値は E_PAR である。
+
+1. 3  ディレクトリ構成
+
+  TINET のディレクトリは、 TOPPERS/ASP または TOPPERS/JSP のルートディ
+レクトリの下に置くことを想定しており、以下のディレクトリから構成されて
+いる。
+
+   tinet                   TINET のルートディレクトリ
+   tinet/cfg               TINET コンフィギュレータ（TOPPERS/JSP 用のみ）
+   tinet/doc               ドキュメント類
+   tinet/net               汎用ネットワーク
+   tinet/netapp            サンプルのネットワークプログラム
+   tinet/netdev            ネットワークインタフェースのドライバ
+   tinet/netinet           IPv4/TCP/UDP/ICMP
+   tinet/netinet6          IPv6/ICMPv6/NDP
+
+1. 4  ドキュメント類
+
+  ドキュメント類を以下に示す。全てのファイルは PDF でも提供している。
+
+   tinet.txt               ユーザズマニュアル
+   tinet_gcc.txt           ユーザズマニュアル【GCC 環境】
+   tinet_cs.txt            ユーザズマニュアル【CS+ 環境（参考）】
+   tinet_sample.txt        サンプルアプリケーション
+   tinet_config.txt        コンパイル時コンフィギュレーション
+   tinet_defs.txt          プロセッサ、システム依存定義
+
+
+
+
+
+苫小牧工業高等専門学校          - 2 -                       情報工学科
+
+
+
+
+TINET ユーザズマニュアル                          1. 4  ドキュメント類
+
+   tinet_chg.txt           変更メモ
+   tinet_ether.pdf         TINET-1.4 におけるイーサネットの実装（PDFのみ）
+
+2.  TINET コンフィギュレータと TINET コンフィグレーションファイル
+
+2. 1  TOPPERS/ASP
+
+  TOPPERS/ASP では、 TOPPERS/ASP 用コンフィギュレータを流用するため、
+TINET 独自のコンフィギュレータはない。
+  TOPPERS/ASP 用コンフィギュレータを流用して、TINET コンフィギュレーショ
+ンファイル（標準は tinet_$(APPLNAME).cfg）から以下のファイルを生成する。
+
+   (1)   tinet_cfg.c
+         TINET カーネル構成ファイルで、 アプリケーションプログラム、
+         TINET と共にコンパイルしてリンクする。
+
+   (2)   tinet_kern.cfg
+         TINET 内部で使用するカーネルオブジェクトの静的 API が生成され、
+         TOPPERS/ASP システムコンフィギュレーションファイル（標準は
+         $(APPLNAME).cfg）にインクルードする。
+
+   (3)   tinet_cfg.h
+         TINET 内部で使用するカーネルオブジェクトの ID 自動割付結果ファ
+         イルである。
+
+2. 2  TOPPERS/JSP
+
+  TINET コンフィギュレータは tinet/cfg/tinet_cfg (cygwin では
+tinet_cfg.exe) であり、ターゲットには依存していない。 TINET コンフィグ
+レータの生成については「8. TOPPERS/JSP 環境におけるインストールとファ
+イルの作成・変更 」を参照すること。 
+  TOPPERS/JSP 用 TINET コンフィギュレータは TINET コンフィギュレーショ
+ンファイル（標準は tinet_$(UNAME).cfg）から以下のファイルを生成する。
+
+   (1)   tinet_cfg.c
+         TINET カーネル構成ファイルで、 アプリケーションプログラム、
+         TINET と共にコンパイルしてリンクする。
+
+   (2)   tinet_kern.cfg
+         TINET 内部で使用するカーネルオブジェクトの静的 API が生成され、
+         TOPPERS/JSP システムコンフィギュレーションファイル（標準は
+         $(UNAME).cfg）にインクルードする。
+
+   (3)   tinet_id.h
+         TINET 内部で使用するカーネルオブジェクトの ID 自動割付結果ファ
+         イルである。
+
+3.  ITRON TCP/IP API仕様
+
+3. 1  暫定的なITRON TCP/IP（バージョン6）API仕様
+
+  IPv6 に関する ITRON TCP/IP API 2.0 仕様には未対応である。 TINET リリー
+ス 1.2 からの暫定的な ITRON TCP/IP（バージョン 6）API 仕様にのみ対応し
+ている。
+
+   (1)   1.5.1 データ構造／データ型 (1) IP アドレス／ポート番号を入れ
+         るデータ構造
+
+            /* IPv6 アドレス */
+            struct t_in6_addr {
+                union {
+                    uint8_t    __u6_addr8[16];
+                    uint16_t   __u6_addr16[8];
+                    uint32_t   __u6_addr32[4];
+                    } __u6_addr;
+                } T_IN6_ADDR;
+            
+            typedef struct t_ipv6ep {
+                T_IN6_ADDR    ipaddr;        /* IPv6 アドレス */
+                uint16_t      portno;        /* ポート番号    */
+                } T_IPV6EP;
+
+   (2)   1.5.1 データ構造／データ型 (2) オブジェクト生成用のデータ構造
+
+            typedef struct t_tcp6_crep {
+                /* 標準 */
+                ATR         repatr;        /* 受付口属性        */
+                T_IPV6EP    myaddr;        /* 自分のアドレス    */
+                /* 実装依存 */
+                } T_TCP6_CREP;
+
+   (3)   1.5.1 データ構造／データ型 (5) 特殊な IP アドレスとポート番号
+
+            #define IPV6_ADDR_UNSPECIFIED_INIT    \
+                {{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }}}
+            #define IPV6_ADDRANY        IPV6_ADDR_UNSPECIFIED_INIT
+
+   (4)   2.2 TCP 受付口の生成／削除
+         【静的 API】
+               TCP6_CRE_REP(ID repid, { ATR repatr,
+                                      { T_IN6_ADDR myipaddr, uint16_t myportno } } );
+
+         【API の機能】
+                 myipaddr の型が T_IN6_ADDR になった以外は、 ITRON
+               TCP/IP API 仕様と同じである。myipaddr には IPV6_ADDRANY
+               を指定できる。
+
+   (5)   2.4 接続／切断「接続要求待ち（受動オープン）」
+         【C 言語 API】
+               ER ercd = tcp6_acp_cep(ID cepid, ID repid,
+                                      T_IPV6EP *p_dstaddr, TMO tmout);
+
+         【API の機能】
+                 p_dstaddr の型が、 T_IPV6EP* になった以外は、 ITRON
+               TCP/IP API 仕様と同じである。
+
+   (6)   2.4 接続／切断「接続要求（能動オープン）」
+         【C 言語 API】
+               ER ercd = tcp6_con_cep(ID cepid, T_IPV6EP *p_myaddr,
+                                      T_IPV6EP *p_dstaddr, TMO tmout);
+
+         【機能】
+                 p_myaddr と p_dstaddr の型が、 T_IPV6EP* になった以外
+               は、ITRON TCP/IP API 仕様と同じである。
+
+   (7)   3.2 UDP 通信端点の生成／削除
+         【静的 API】
+               UDP6_CRE_CEP(ID cepid, { ATR cepatr,
+                                      { T_IN6_ADDR myipaddr, uint16_t myportno },
+                                        FP callback } );
+
+         【機能】
+                 myipaddr の型が T_IN6_ADDR になった以外は、 ITRON
+               TCP/IP API 仕様と同じである。myipaddr には IPV6_ADDRANY
+               を指定できる。
+
+   (8)   3.3 データの送受信「パケットの送信」
+         【C 言語 API】
+               ER ercd = udp6_snd_dat(ID cepid, T_IPV6EP *p_dstaddr, 
+                                      void *data, int_t len, TMO tmout);
+
+         【機能】
+                 p_dstaddr の型が、 T_IPV6EP* になった以外は、 ITRON
+               TCP/IP API 仕様と同じである。
+
+   (9)   3.4 データの送受信「パケットの受信」
+         【C 言語 API】
+               ER ercd = udp6_rcv_dat(ID cepid, T_IPV6EP *p_dstaddr, 
+                                      void *data, int_t len, TMO tmout);
+
+         【機能】
+                 p_dstaddr の型が、 T_IPV6EP* になった以外は、 ITRON
+               TCP/IP API 仕様と同じである。
+
+3. 2  サポートするオブジェクトの定義
+
+  サポートするオブジェクトの定義は、以下に示す ITRON TCP/IP API 仕様の
+静的 API、 暫定的な ITRON TCP/IP（バージョン 6）API 仕様の静的 API、
+TINET 独自の静的 API、ファイルのインクルードである。
+
+   (1)   TCP 受付口（IPv4）
+         【静的 API】
+               TCP_CRE_REP(ID repid, { ATR repatr,
+                                     { uint32_t myipaddr, uint16_t myportno } } );
+
+         【パラメータ】
+                 パラメータについては、ITRON TCP/IP API 仕様と同じであ
+               り、実装依存の TCP 受付口属性はない。
+         【TCP 受付口数の定義】
+                 TCP 受付口数を定義するプリプロセッサディレクティブで
+               あり、tinet_cfg.c に出力される。
+                     #define TNUM_TCP_REPID <TCP受付口数>
+
+         【TCP 受付口 ID の最大値の変数の定義】
+                 TCP 受付口 ID の最大値の変数の定義であり、tinet_cfg.c
+               に出力される。
+                     const ID tmax_tcp_repid =
+                              (TMIN_TCP_REPID + TNUM_TCP_REPID - 1);
+
+   (2)   TCP 通信端点（IPv4）
+         【静的 API】
+               TCP_CRE_CEP(ID cepid, { ATR cepatr, void *sbuf, int_t sbufsz,
+                                                   void *rbuf, int_t rbufsz,
+                                                   FP callback } );
+
+         【パラメータ】
+                 パラメータについては、ITRON TCP/IP API 仕様と同じであ
+               り、実装依存の TCP 通信端点属性はない。
+         【TCP 通信端点数の定義】
+                 TCP 通信端点数を定義するプリプロセッサディレクティブ
+               であり、tinet_cfg.c に出力される。
+                     #define TNUM_TCP_CEPID <TCP通信端点数>
+
+         【TCP 通信端点 ID の最大値の変数の定義】
+                 TCP 通信端点 ID の最大値の変数の定義であり、
+               tinet_cfg.c に出力される。
+                     const ID tmax_tcp_cepid =
+                              (TMIN_TCP_CEPID + TNUM_TCP_CEPID - 1);
+
+   (3)   UDP 通信端点（IPv4）
+         【静的 API】
+               UDP_CRE_CEP(ID cepid, { ATR cepatr,
+                                     { uint32_t myipaddr, uint16_t myportno },
+                                       FP callback } );
+
+         【パラメータ】
+                 パラメータについては、ITRON UDP/IP API 仕様と同じであ
+               り、実装依存の UDP 通信端点属性はない。
+         【UDP 通信端点数の定義】
+                 UDP 通信端点数を定義するプリプロセッサディレクティブ
+               であり、tinet_cfg.c に出力される。
+                     #define TNUM_UDP_CEPID <UDP通信端点数>
+
+         【UDP 通信端点 ID の最大値の変数の定義】
+                 UDP 通信端点 ID の最大値の変数を定義であり、
+               tinet_cfg.c に出力される。
+                     const ID tmax_udp_cepid =
+                              (TMIN_UDP_CEPID + TNUM_UDP_CEPID - 1);
+
+   (4)   TCP 受付口（IPv6）
+         【静的 API】
+               TCP6_CRE_REP(ID repid, { ATR repatr,
+                                      { T_IN6_ADDR myipaddr, uint16_t myportno } } );
+
+         【パラメータ】
+                 パラメータについては、myipaddr で指定する IP アドレス
+               は IPv6 であり、 IPv4 の IP_ADDRANY の代わりに、IPv6 で
+               は IPV6_ADDRANY を指定できる。これ以外は、 ITRON TCP/IP
+               API 仕様と同じであり、実装依存の TCP 受付口属性はない。
+         【TCP 受付口数の定義】
+                 TCP 受付口数を定義するプリプロセッサディレクティブで
+               あり、tinet_cfg.c に出力される。
+                     #define TNUM_TCP_REPID <TCP受付口数>
+
+         【TCP 受付口 ID の最大値の変数の定義】
+                 TCP 受付口 ID の最大値の変数を定義であり、tinet_cfg.c
+               に出力される。
+                     const ID tmax_tcp_repid =
+                              (TMIN_TCP_REPID + TNUM_TCP_REPID - 1);
+
+   (5)   TCP 通信端点（IPv6）
+         【静的 API】
+               TCP6_CRE_CEP(ID cepid, { ATR cepatr, void *sbuf, int_t sbufsz,
+                                                    void *rbuf, int_t rbufsz,
+                                                    FP callback } );
+
+         【パラメータ】
+                 パラメータについては、ITRON TCP/IP API 仕様と同じであ
+               り、実装依存の TCP 通信端点属性はない。
+
+         【TCP 通信端点数の定義】
+                 TCP 通信端点数を定義するプリプロセッサディレクティブ
+               であり、tinet_cfg.c に出力される。
+                     #define TNUM_TCP_CEPID <TCP通信端点数>
+
+         【TCP 通信端点 ID の最大値の変数の定義】
+                 最大の TCP 通信端点 ID の最大値の変数を定義であり、
+               tinet_cfg.c に出力される。
+                     const ID tmax_tcp_cepid =
+                              (TMIN_TCP_CEPID + TNUM_TCP_CEPID - 1);
+
+   (6)   UDP 通信端点（IPv6）
+         【静的 API】
+               UDP6_CRE_CEP(ID cepid, { ATR cepatr,
+                                      { T_IN6_ADDR myipaddr, uint16_t myportno },
+                                        FP callback } );
+
+         【パラメータ】
+                 パラメータについては、myipaddr で指定する IP アドレス
+               は IPv6 であり、 IPv4 の IP_ADDRANY の代わりに、IPv6 で
+               は IPV6_ADDRANY を指定できる。これ以外は、 ITRON TCP/IP
+               API 仕様と同じであり、実装依存の TCP 受付口属性はない。
+         【UDP 通信端点数の定義】
+                 UDP 通信端点数を定義するプリプロセッサディレクティブ
+               であり、tinet_cfg.c に出力される。
+                     #define TNUM_UDP_CEPID <UDP通信端点数>
+
+         【UDP 通信端点 ID の最大値の変数の定義】
+                 UDP 通信端点 ID の最大値の変数を定義であり、
+               tinet_cfg.c に出力される。
+                     const ID tmax_udp_cepid =
+                              (TMIN_UDP_CEPID + TNUM_UDP_CEPID - 1);
+
+   (7)   TCP 受付口の予約 ID（IPv4、TINET 独自）
+         【静的 API】
+               VRID_TCP_REP(ID repid);
+
+         【パラメータ】
+               ID        repid     予約するTCP受付口ID
+
+   (8)   TCP 通信端点の予約 ID（IPv4、TINET 独自）
+         【静的 API】
+               VRID_TCP_CEP(ID cepid);
+
+         【パラメータ】
+               ID        repid     予約するTCP通信端点ID
+
+   (9)   UDP 通信端点の予約 ID（IPv4、TINET 独自）
+         【静的 API】
+               VRID_UDP_CEP(ID cepid);
+
+         【パラメータ】
+               ID        repid     予約するUDP通信端点ID
+
+   (10)  TCP 受付口の予約 ID（IPv6、TINET 独自）
+         【静的 API】
+               VRID_TCP6_REP(ID repid);
+
+         【パラメータ】
+               ID        repid     予約するTCP受付口ID
+
+   (11)  TCP 通信端点の予約 ID（IPv6、TINET 独自）
+         【静的 API】
+               VRID_TCP6_CEP(ID cepid);
+
+         【パラメータ】
+               ID        repid     予約するTCP通信端点ID
+
+   (12)  UDP 通信端点の予約 ID（IPv6、TINET 独自）
+         【静的 API】
+               VRID_UDP6_CEP(ID cepid);
+
+         【パラメータ】
+               ID        repid     予約するUDP通信端点ID
+
+4.  ITRON TCP/IP API 拡張機能
+
+  TINET リリース 1.3 までは、ITRON TCP/IP API の標準機能のみに対応して
+いたが、 リリース 1.4 からは、拡張機能にも対応した。ただし、応用プログ
+ラムから使用する場合は、以下に示すコンパイル時コンフィギュレーションパ
+ラメータを指定しなければならない。 
+
+   (1)   TCP_CFG_EXTENTIONS
+         ITRON TCP/IP API の TCP の拡張機能を有効にする。
+
+   (2)   UDP_CFG_EXTENTIONS
+         ITRON TCP/IP API の UDP の拡張機能を有効にする。
+
+4. 1  TCP の ITRON TCP/IP API 拡張機能
+
+  TCP_CFG_EXTENTIONS を指定することにより使用可能となる API を以下に示
+す。
+
+   ・TCP 受付口の予約 ID【静的 API、VRID_TCP_REP】（IPv4、TINET 独自）
+   ・TCP 受付口の予約 ID【静的 API、VRID_TCP6_REP】（IPv6、TINET 独自）
+   ・TCP 通信端点の予約 ID【静的 API、VRID_TCP_CEP】（IPv4、TINET 独自）
+   ・TCP 通信端点の予約 ID【静的 API、 VRID_TCP6_CEP】（IPv6、TINET 独自）
+   ・TCP 受付口の生成【動的 API、tcp_cre_rep】（IPv4）
+   ・TCP 受付口の生成【動的 API、tcp6_cre_rep】（IPv6、TINET 独自）
+   ・TCP 受付口の削除【動的 API、tcp_del_rep】
+   ・TCP 通信端点の生成【動的 API、tcp_cre_cep】
+   ・TCP 通信端点の削除【動的 API、tcp_del_cep】
+   ・緊急データの送信【tcp_snd_oob】
+   ・緊急データの受信【tcp_rcv_oob】
+   ・TCP 通信端点オプションの設定【tcp_set_opt】
+   ・TCP 通信端点オプションの読出し【tcp_get_opt】
+   ・緊急データ受信【コールバック、TEV_TCP_RCV_OOB】
+
+   (1)   TCP 受付口の生成と削除
+           この機能により、1 個の TCP 受付口を複数のタスクで共有するこ
+         とができる。ただし、1 回に使用できるのは 1 個のタスクに限定さ
+         れる。 以下に標準的な使用方法を述べる。 なお、 煩雑になるため
+         IPv6 に関しての説明は、一部省略している。
+
+         [1]   TCP 受付口の予約 ID【静的 API、 VRID_TCP_REP、
+               VRID_TCP6_REP】により、TCP 受付口 ID を予約する。
+
+               VRID_TCP_REP の書式を以下に示す。
+
+                  VRID_TCP_REP(ID repid);
+
+               パラメータ repid は予約する TCP 受付口 ID であり、 一般
+               的には、 TINET コンフィグレーションファイルに以下のよう
+               に指定する。
+
+                  VRID_TCP_REP (TCP_RSV_REPID1);
+
+               これにより、 TCP 受付口用のメモリ領域が確保され、 TINET
+               内部で使用するカーネルオブジェクトの ID 自動割付結果ファ
+               イル（TOPPERS/ASP は tinet_cfg.h、 TOPPERS/JSP は
+               tinet_id.h）に、 対応するマクロ定義が以下のように出力される。
+
+                  #define TCP_RSV_REPID1  1
+
+         [2]   TCP 受付口の生成【動的 API、tcp_cre_rep、tcp6_cre_rep】
+               により、TCP 受付口を生成する。
+
+               まず、TCP 受付口生成情報構造体に情報を設定する。IPv4 の
+               場合の例を以下に示す。
+
+                  T_TCP_CREP crep;
+                  crep.repatr = 0;
+                  crep.myaddr.portno = 7;
+                  crep.myaddr.ipaddr = IPV4_ADDRANY;
+
+               また IPv6 の場合の例を以下に示す。
+
+                  T_TCP6_CREP crep;
+                  crep.repatr = 0;
+                  crep.myaddr.portno = 7;
+                  memcpy(&crep.myaddr.ipaddr, &ipv6_addrany, sizeof(T_IN6_ADDR));
+
+               いずれも、 受付ける自分の IP アドレスは規定値（全て）である。
+                 次に、tcp_cre_rep の書式を示す。
+
+                  ER ercd = tcp_cre_rep(ID repid, T_TCP_CREP *pk_crep);
+
+               パラメータ repid には [1] で予約した TCP 受付口 ID を指
+               定し、pk_crep には上記で設定済みの TCP 受付口生成情報へ
+               のポインタを指定する。一般的な例を以下に示す。 
+
+                  ercd = tcp_cre_rep(TCP_RSV_REPID1, &crep);
+
+               これにより、 VRID_TCP_REP で確保された TCP 受付口用のメ
+               モリ領域に TCP 受付口生成情報が書込まれる。
+
+         [3]   接続要求待ち（受動オープン）【tcp_acp_cep、tcp6_acp_cep】
+               により、接続要求待ち（受動オープン）する。 
+
+               tcp_acp_cep の書式を示す。
+
+                  ER ercd = tcp_acp_cep(ID cepid, ID repid,
+                                        T_IPV4EP *p_dstaddr, TMO tmout);
+
+               パラメータ repid に [1] で予約した TCP 受付口 ID を指定
+               する以外は、 通常の呼び出しと同じである。
+
+         [4]   TCP 受付口の削除【動的 API、tcp_del_rep】により、TCP 受
+               付口を削除する。
+
+                 通常は、 接続要求待ち（受動オープン）が終了した後に、
+               TCP 受付口を削除するが、 接続要求待ち（受動オープン）中
+               に、tcp_del_cep により、 TCP 通信端点を削除することも可
+               能である。 この場合、tcp_acp_cep の戻り値には、E_DLT が
+               返される。TCP 受付口を削除すると、 他のタスクが同じ TCP
+               受付口 ID を利用できる。tcp_del_rep の書式を示す。
+
+                  ER ercd = tcp_del_rep(ID cepid);
+
+               パラメータ repid には [1] で予約した TCP 受付口 ID を指
+               定する。
+
+   (2)   TCP 通信端点の生成と削除
+           この機能により、1 個の TCP 通信端点を複数のタスクで共有する
+         ことができる。ただし、1 回に使用できるのは 1 個のタスクに限定
+         される。 以下に標準的な使用方法を述べる。なお、煩雑になるため
+         IPv6 に関しての説明は、一部省略している。
+
+         [1]   TCP 通信端点の予約 ID【静的 API、 VRID_TCP_CEP、
+               VRID_TCP6_CEP】により、TCP 通信端点 ID を予約する。
+
+               VRID_TCP_CEP の書式を以下に示す。
+
+                  VRID_TCP_CEP(ID cepid);
+
+               パラメータ cepid は予約する TCP 通信端点 ID であり、 一
+               般的には、 TINET コンフィグレーションファイルに以下のよ
+               うに指定する。
+
+                  VRID_TCP_CEP (TCP_RSV_CEPID1);
+
+               これにより、TCP 通信端点用のメモリ領域が確保され、TINET
+               内部で使用するカーネルオブジェクトの ID 自動割付結果ファ
+               イル（TOPPERS/ASP は tinet_cfg.h、 TOPPERS/JSP は
+               tinet_id.h）に、 対応するマクロ定義が以下のように出力される。
+
+                  #define TCP_RSV_CEPID1  1
+
+         [2]   TCP 通信端点の生成【動的 API、 tcp_cre_cep】により、TCP
+               通信端点を生成する。
+
+               まず、TCP 通信端点生成情報構造体に情報を設定する。 一般
+               的な例を以下に示す。
+
+                  T_TCP_CCEP ccep;
+                  ccep.cepatr = 0;
+                  ccep.sbufsz = TCP_ECHO_SRV_SWBUF_SIZE;
+                  ccep.rbufsz = TCP_ECHO_SRV_RWBUF_SIZE;
+                  ccep.sbuf = tcp_echo_srv_swbuf;
+                  ccep.rbuf = tcp_echo_srv_rwbuf;
+                  ccep.callback = (FP)callback_nblk_tcp_echo_srv;
+
+               次に、tcp_cre_cep の書式を示す。
+
+                  ER ercd = tcp_cre_cep(ID cepid, T_TCP_CCEP *pk_ccep);
+
+               パラメータ cepid には [1] で予約した TCP 通信端点 ID を
+               指定し、pk_ccep には上記で設定済みの TCP 通信端点生成情
+               報へのポインタを指定する。 一般的な例を以下に示す。 
+
+                  ercd = tcp_cre_cep(TCP_RSV_CEPID1, &ccep);
+
+               これにより、 VRID_TCP_CEP で確保された TCP 通信端点用の
+               メモリ領域に TCP 通信端点生成情報が書込まれる。
+                 この後、TCP の各 API のパラメータ cepid に [1] で予約
+               した TCP 通信端点 ID を指定する以外は、 通常の TCP 通信
+               端点と同じように使用できる。
+
+         [3]   TCP 通信端点の削除【動的 API、tcp_del_cep】により、 TCP
+               通信端点を削除する。
+
+                 tcp_cls_cep を呼び出すまでは、 TCP 通信端点を削除でき
+               ないが、tcp_cls_cep の後は TCP 通信端点を削除でき、他の
+               タスクが同じ TCP 通信端点 ID を利用できる。 tcp_del_cep
+               の書式を示す。
+
+                  ER ercd = tcp_del_cep(ID cepid);
+
+               パラメータ cepid には [1] で予約した TCP 通信端点 ID を
+               指定する。
+
+   (3)   緊急データの送受信
+
+         [1]   緊急データの送信【tcp_snd_oob】
+
+               tcp_snd_oob の書式を以下に示す。
+
+                  ER_UINT ercd = tcp_snd_oob(ID cepid, void *data, int_t len, TMO tmout);
+
+               なお、 以下に示すような制約がある。
+
+               ・緊急データだからといって、 すでに送信ウィンドバッファ
+                 にある通常のデータより先に送信されるわけではない。 
+               ・tcp_snd_oob で、複数バイトのデータを送信しても（len >
+                 1）、受信側で受信できるのは、送信した data の最後の 1
+                 バイトのみである。また、 これより前のデータは通常のデー
+                 タとして受信される。
+
+         [2]   緊急データの受信【tcp_rcv_oob】
+
+               tcp_rcv_oob の書式を以下に示す。
+
+                  ER_UINT ercd = tcp_rcv_oob(ID cepid, void *data, int_t len);
+
+               なお、 以下に示すような制約がある。
+
+               ・緊急データ受信のコールバック関数内で呼び出すことを想
+                 定している。
+               ・受信できるのは、緊急データの最後の 1 バイトのみである。
+                 従って、正常に tcp_rcv_oob から戻ってきた時の戻り値は、
+                 常に 1 である。
+
+         [3]   緊急データ受信【コールバック、TEV_TCP_RCV_OOB】
+                 緊急データを受信した時、 TCP 通信端点に指定されている
+               コールバック関数を呼び出す。 この時の事象の種類が
+               TEV_TCP_RCV_OOB である。ただし、 TCP 通信端点にコールバッ
+               ク関数が指定されていない場合、 または、コールバック関数
+               内で tcp_rcv_oob が呼び出されなければ、受信した緊急デー
+               タは通常のデータとして受信する。
+
+         [4]   コンパイル時コンフィギュレーションパラメータ
+
+                  TCP_CFG_URG_OFFSET
+
+               緊急データの最後のバイトのオフセット、 値が -1 の場合は
+               BSD の実装と同じで、 緊急ポインタは、緊急データの最後の
+               バイトの次のバイトを差す。 値が 0 の場合は RFC1122 の規
+               定と同じで、 緊急ポインタは、緊急データの最後のバイトを
+               差す。既定値は -1 である。
+
+   (4)   TCP 通信端点オプションの設定と読出し
+           設定可能な TCP 通信端点オプションは無いため、どちらの関数も
+         戻り値として E_PAR が返される。
+
+4. 2  UDP の ITRON TCP/IP API 拡張機能
+
+  UDP_CFG_EXTENTIONS を指定することにより使用可能となる API を以下に示
+す。
+
+   ・UDP 通信端点の予約 ID【静的 API、VRID_UDP_CEP】（IPv4、TINET 独自）
+   ・UDP 通信端点の予約 ID【静的 API、VRID_UDP6_CEP】（IPv6、TINET 独自）
+   ・UDP 通信端点の生成【動的 API、udp_cre_cep】（IPv4）
+   ・UDP 通信端点の生成【動的 API、udp6_cre_cep】（IPv6、TINET 独自）
+   ・UDP 通信端点の削除【動的 API、udp_del_cep】
+   ・UDP 通信端点オプションの設定【udp_set_opt】
+   ・UDP 通信端点オプションの読出し【udp_get_opt】
+
+   (1)   UDP 通信端点の生成と削除
+           この機能により、1 個の UDP 通信端点を複数のタスクで共有する
+         ことができる。ただし、1 回に使用できるのは 1 個のタスクに限定
+         される。 以下に標準的な使用方法を述べる。なお、煩雑になるため
+         IPv6 に関しての説明は、一部省略している。
+
+         [1]   UDP 通信端点の予約 ID【静的 API、 VRID_UDP_CEP、
+               VRID_UDP6_CEP】により、UDP 通信端点 ID を予約する。
+
+               VRID_UDP_CEP の書式を以下に示す。
+
+                  VRID_UDP_CEP(ID cepid);
+
+               パラメータ cepid は予約する UDP 通信端点 ID であり、 一
+               般的には、 TINET コンフィグレーションファイルに以下のよ
+               うに指定する。
+
+                  VRID_UDP_CEP (UDP_RSV_CEPID1);
+
+               これにより、UDP 通信端点用のメモリ領域が確保され、TINET
+               内部で使用するカーネルオブジェクトの ID 自動割付結果ファ
+               イル（TOPPERS/ASP は tinet_cfg.h、 TOPPERS/JSP は
+               tinet_id.h）に、 対応するマクロ定義が以下のように出力される。
+
+                  #define UDP_RSV_CEPID1  1
+
+         [2]   UDP 通信端点の生成【動的 API、 udp_cre_cep】により、UDP
+               通信端点を生成する。
+
+               まず、UDP 通信端点生成情報構造体に情報を設定する。 通信
+               相手からのデータの受信を待つ応用アプリケーションで、
+               IPv4 の場合の例を以下に示す。
+
+                  T_UDP_CCEP ccep;
+                  ccep.cepatr = 0;
+                  ccep.myaddr.portno = 7;
+                  ccep.myaddr.ipaddr = IPV4_ADDRANY;
+
+               また IPv6 の場合の例を以下に示す。
+
+                  T_UDP_CCEP ccep;
+                  ccep.cepatr = 0;
+                  ccep.myaddr.portno = 7;
+                  memcpy(&ccep.myaddr.ipaddr, &ipv6_addrany, sizeof(T_IN6_ADDR));
+
+               いずれも、 受付ける自分の IP アドレスは規定値（全て）である。
+                 次に、udp_cre_cep の書式を示す。
+
+                  ER ercd = udp_cre_cep(ID cepid, T_UDP_CCEP *pk_ccep);
+
+               パラメータ cepid には [1] で予約した UDP 通信端点 ID を
+               指定し、pk_ccep には上記で設定済みの UDP 通信端点生成情
+               報へのポインタを指定する。 一般的な例を以下に示す。 
+
+                  ercd = udp_cre_cep(UDP_RSV_CEPID1, &ccep);
+
+               これにより、 VRID_UDP_CEP で確保された UDP 通信端点用の
+               メモリ領域に UDP 通信端点生成情報が書込まれる。
+                 この後、UDP の各 API のパラメータ cepid に [1] で予約
+               した UDP 通信端点 ID を指定する以外は、 通常の UDP 通信
+               端点と同じように使用できる。
+
+         [3]   UDP 通信端点の削除【動的 API、 udp_del_cep】により、UDP
+               通信端点を削除する。
+
+                 UDP 通信端点はいつでも削除でき、 他のタスクが同じ UDP
+               通信端点 ID を利用できる。 なお、udp_snd_dat で送信待ち
+               の時、または、udp_rcv_dat で受信待ちの時に、udp_del_cep
+               により、UDP 通信端点を削除すると、 それぞれの関数の戻り
+               値には、E_DLT が返される。
+                 次に、udp_del_cep の書式を示す。
+
+                  ER ercd = udp_del_cep(ID cepid);
+
+               パラメータ cepid には [1] で予約した UDP 通信端点 ID を
+               指定する。
+
+   (2)   UDP 通信端点オプションの設定と読出し
+           設定可能な TCP 通信端点オプションは無いため、どちらの関数も
+         戻り値として E_PAR が返される。
+
+5.  ルーティングの設定
+
+  ルーティングエントリには、静的ルーティングエントリと向け直し（ICMP）
+によるルーティングエントリがある。 
+  静的ルーティングエントリは、予め決められたルーティング情報であり、ルー
+ティング設定ファイル route_cfg.c のルーティング表エントリ配列に設定す
+る。なお、ディフォルトゲートウェイのみのシンプルなネットワークでは、サ
+ンプルアプリケーション echos の route_cfg.c をそのまま流用できる。
+  向け直し（ICMP）によるルーティングエントリは、TINET コンフィギュレー
+ション・パラメータ定義ファイルで、ルーティング表で予め確保するエントリ
+数を定義し、 ルーティング設定ファイル route_cfg.c のルーティング表エン
+トリ配列に、 空のエントリとして確保する。
+
+   (1)   ルーティング表のエントリ数の設定
+           エントリ数の設定するマクロは、 TINET コンフィギュレーション・
+         パラメータ定義ファイルで定義する。 
+
+         [1]   NUM_IN6_STATIC_ROUTE_ENTRY
+               IPv6 用のルーティング表の静的ルーティングエントリ数を指
+               定する。
+         [2]   NUM_IN6_REDIRECT_ROUTE_ENTRY
+               IPv6 用のルーティング表で予め確保する、向け直し（ICMP）
+               によるルーティングエントリ数を指定する。 0 を指定すると、
+               向け直し（ICMPv6）を無視する。
+         [3]   NUM_IN4_STATIC_ROUTE_ENTRY
+               IPv4 用のルーティング表の静的ルーティングエントリ数を指
+               定する。
+         [4]   NUM_IN4_REDIRECT_ROUTE_ENTRY
+               IPv4 用のルーティング表で予め確保する、向け直し（ICMP）
+               によるルーティングエントリ数を指定する。 0 を指定すると、
+               向け直し（ICMP）を無視する。
+
+   (2)   ルーティング表エントリ構造体（IPv6）
+           IPv6 では、#include <netinet6/in6_var.h> で定義されている。
+         各フィールドの意味を以下に示す。
+
+            T_IN6_ADDR      target          目標ネットワークアドレス
+            T_IN6_ADDR      gateway         ゲートウェイの IP アドレス
+            uint32_t        expire          有効時間が切れる時刻、0xffffffff を指定すること。
+            uint8_t         flags           フラグ、0x01 を指定すること。
+            uint8_t         prefix_len      プレフィックス長
+
+         IP アドレスは、{{{ と }}} で囲み、 1 オクテット単位で指定する。
+         例を以下に示す。
+
+            { { { 0xfe, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x41,
+                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+
+   (3)   ルーティング表エントリ構造体（IPv4）
+           IPv4 では、#include <netinet/in_var.h> で定義されている。各
+         フィールドの意味を以下に示す。
+
+            T_IN4_ADDR      targe           目標ネットワークのIPアドレス、
+                                            ディフォルトゲートウェイでは0を指定する。
+            T_IN4_ADDR      mask            目標ネットワークのサブネットマスク、
+                                            ディフォルトゲートウェイでは0を指定する。
+            T_IN4_ADDR      gateway         ゲートウェイの IP アドレス、
+                                            自ネットワーク内では0を指定する。
+
+   (4)   インクルードファイル
+           以下のインクルードファイルを指定すること。 
+
+         [1]   TOPPERS/ASP
+
+                  #include <kernel.h>
+                  #include <tinet_defs.h>
+                  #include <tinet_config.h>
+                  #include <netinet/in.h>
+                  #include <netinet/in_var.h>
+
+         [2]   TOPPERS/JSP
+
+                  #include <s_services.h>
+                  #include <t_services.h>
+                  #include <tinet_defs.h>
+                  #include <tinet_config.h>
+                  #include <netinet/in.h>
+                  #include <netinet/in_var.h>
+
+   (5)   ルーティング表エントリ配列（IPv6）
+           以下のように指定すること。
+
+            T_IN6_RTENTRY routing6_tbl[NUM_ROUTE_ENTRY] = {
+                <ルーティング表エントリ構造体 1>,
+                <ルーティング表エントリ構造体 2>,
+                ...
+                <ルーティング表エントリ構造体 n>,
+                };
+
+   (6)   ルーティング表エントリ配列（IPv4）
+           以下のように指定すること。
+
+            T_IN4_RTENTRY routing4_tbl[NUM_ROUTE_ENTRY] = {
+                <ルーティング表エントリ構造体 1>,
+                <ルーティング表エントリ構造体 2>,
+                ...
+                <ルーティング表エントリ構造体 n>,
+                };
+
+   (7)   探索順序
+           探索は、インデックスが大きな順、つまり、 ルーティング表エン
+         トリ配列の最後の <ルーティング表エントリ構造体 n> から、 最初
+         の <ルーティング表エントリ構造体 1> に向って行われる。
+
+6.  TINET 独自機能
+
+6. 1  タスクからの Time Wait 状態の TCP 通信端点分離機能
+
+  TCP 通信端点は、ソケットインタフェースにおけるファイルディスクリプタ
+と異なり、 TCP の接続状態が完全に終了するまで再利用可能とはならない。
+TCP/IP プロトコルの仕様に従うと、 接続状態が完全に終了するまで数分かか
+る場合がある。問題になるのは、先に、TCP 通信端点のコネクション切断 API
+の tcp_sht_cep を呼出し、 コネクションを切断する場合である。 この時、
+tcp_sht_cep で指定された TCP 通信端点は、最終的に Time Wait 状態になり、
+TCP 通信端点のクローズ API の tcp_cls_cep を呼出したタスクも、タイムア
+ウト待ち状態になる。従って、サーバ側から切断する応用プログラム（WWW な
+ど）のタスクでは、タイムアウトするまで、次の接続要求を受信することがで
+きない。
+  これに対応するため、 TINET は、終了待ちの TCP 通信端点をタスクから切
+り離すことにより、タスクが待ち状態にならないようにする機能を持っており、
+有効にするためには、 コンパイル時コンフィギュレーションパラメータ
+NUM_TCP_TW_CEP_ENTRY を tinet_app_config.h 等に指定し、 確保する TW 用
+TCP 通信端点の数（1 以上の値）を定義する。
+  TCP 通信端点が Time Wait になると、TCP 通信端点から、 Time Wait に必
+要な通信管理データを TW 用 TCP 通信端点にコピーし、元の TCP 通信端点を
+開放する。 これに伴って、 タスクも待ち状態から開放される。 また、TW 用
+TCP 通信端点には Time Wait に必要な通信管理データのみをコピーすること
+で、メモリの消費を抑えている。
+  ただし、この機能を有効にしていても、コネクションの同時切断のタイミン
+グによっては、分離されない場合がある。 
+
+6. 2  受信ウィンドバッファの省コピー機能
+
+  ITRON TCP/IP API 仕様では、TCP 通信端点を生成する静的 API で、受信ウ
+インドバッファの先頭アドレスの指定に、 NADR を指定すると、プロトコルス
+タックで、 受信ウインドバッファを確保することになっている。 
+  TINET では、ネットワークバッファを、受信ウインドバッファとすることで、
+NADR の指定に対応している。 さらに、ネットワークインタフェースで受信し
+たプロトルコデータを保持するネットワークバッファを、そのまま受信ウイン
+ドバッファとすることで、ネットワークインタフェースと、TINET 内部で、デー
+タのコピーを省いている。特に、 省コピー API を使用することにより、 API
+におけるデータのコピーも行わないことも可能である。 
+  この機能に関係するコンパイル時コンフィギュレーションパラメータを、以
+下に示す。
+
+   (1)   TCP_CFG_RWBUF_CSAVE_ONLY
+         TCP 通信端点の受信ウィンドバッファの省コピー機能を組込み、 こ
+         の機能のみ使用する。TCP 通信端点を生成する静的 API で、受信ウ
+         インドバッファの先頭アドレスの指定に、 応用プログラムが用意し
+         たバッファを指定しても無視する。
+
+   (2)   TCP_CFG_RWBUF_CSAVE
+         TCP 通信端点の受信ウィンドバッファの省コピー機能を組込む。TCP
+         通信端点を生成する静的 API で、受信ウインドバッファの先頭アド
+         レスの指定に、NADR を指定した場合は、受信ウィンドバッファの省
+         コピー機能を使用するが、 応用プログラムが用意したバッファを指
+         定した場合は、 受信ウィンドバッファの省コピー機能を使用しない。 
+
+   (3)   TCP_CFG_RWBUF_CSAVE_MAX_QUEUES
+         TCP 通信端点の受信ウィンドバッファの省コピー機能の、 受信ウィ
+         ンドバッファキューの最大エントリ数である。 ただし、正常に受信
+         したセグメントも破棄するため、再送回数が増加する。また、 指定
+         しないと制限しない。
+
+なお、TCP_CFG_RWBUF_CSAVE_ONLY と TCP_CFG_RWBUF_CSAVE の、いずれも指定
+しない場合は、 TCP 通信端点を生成する静的 API で、受信ウインドバッファ
+の先頭アドレスの指定に、NADR を指定することができない。
+
+6. 3  送信ウィンドバッファの省コピー機能
+
+  ITRON TCP/IP API 仕様では、TCP 通信端点を生成する静的 API で、受信ウ
+インドバッファと同様に、 送信ウインドバッファの先頭アドレスの指定に、
+NADR を指定すると、 プロトコルスタックで、送信ウインドバッファを確保す
+ることになっている。
+  TINET では、ネットワークバッファを、送信ウインドバッファとすることで、
+NADR の指定に対応している。さらに、 書込まれたデータの前に必要なヘッダ
+を付加して、そのままネットワークインタフェースに渡すことにより、ネット
+ワークインタフェースと、TINET 内部で、データのコピーを省いている。特に、
+省コピー API を使用することで、 API におけるデータのコピーも行わないこ
+とも可能である。
+  ただし、 イーサネット出力時に、 NIC でネットワークバッファを開放する
+（コンパイル時コンフィギュレーションパラメータ
+ETHER_NIC_CFG_RELEASE_NET_BUF を、指定する必要がある）ディバイスドライ
+バでは、 この送信ウィンドバッファの省コピー機能を利用することはできない。 
+  この機能に関係するコンパイル時コンフィギュレーションパラメータを、以
+下に示す。
+
+   (1)   TCP_CFG_SWBUF_CSAVE_ONLY
+         TCP 通信端点の送信ウィンドバッファの省コピー機能を組込み、 こ
+         の機能のみ使用する。TCP 通信端点を生成する静的 API で、送信ウ
+         インドバッファの先頭アドレスの指定に、 応用プログラムが用意し
+         たバッファを指定しても無視する。
+
+   (2)   TCP_CFG_SWBUF_CSAVE
+         TCP 通信端点の送信ウィンドバッファの省コピー機能を組込む。TCP
+         通信端点を生成する静的 API で、送信ウインドバッファの先頭アド
+         レスの指定に、NADR を指定した場合は、送信ウィンドバッファの省
+         コピー機能を使用するが、 応用プログラムが用意したバッファを指
+         定した場合は、 送信ウィンドバッファの省コピー機能を使用しない。 
+
+   (3)   TCP_CFG_SWBUF_CSAVE_MAX_SIZE
+         TCP 通信端点の送信ウィンドバッファの省コピー機能で、 送信ウィ
+         ンドバッファに使用するネットワークバッファの最大サイズであり、
+         標準値は IF_PDU_SIZE である。
+
+   (4)   TCP_CFG_SWBUF_CSAVE_MIN_SIZE
+         TCP 通信端点の送信ウィンドバッファの省コピー機能で、 送信ウィ
+         ンドバッファに使用するネットワークバッファの最小サイズであり、
+         標準値は 0 である。
+
+なお、TCP_CFG_SWBUF_CSAVE_ONLY と TCP_CFG_SWBUF_CSAVE の、いずれも指定
+しない場合は、TCP 通信端点を生成する静的 API で、 送信ウインドバッファ
+の先頭アドレスの指定に、NADR を指定することができない。
+
+6. 4  ノンブロッキングコールの無効化
+
+  応用プロクラムで、 ノンブロッキングコールを使用しない場合は、 TCP と
+UDP のノンブロッキングコール機能を組込まないで、メモリを節約することが
+できる。
+  この機能に関係するコンパイル時コンフィギュレーションパラメータを、以
+下に示す。
+
+   (1)   TCP_CFG_NON_BLOCKING
+         TCP のノンブロッキングコール機能を組込む。
+
+   (2)   UDP_CFG_NON_BLOCKING
+         UDP のノンブロッキングコール機能を組込む。
+
+ただし、 過去のリリースとの互換性のため、 どちらのパラメータも、
+tinet/tinet_config.h に指定されており、 既定では、ノンブロッキングコー
+ル機能が組込まれるようになっている。 なお、 サンプルアプリケーションの
+tinet_app_config.h には、 指定を解除するマクロが定義されている。組込ま
+ない場合は、以下のマクロを Makefile に定義する。
+
+   UNDEF_TCP_CFG_NON_BLOCKING
+   UNDEF_UDP_CFG_NON_BLOCKING
+
+6. 5  TINETのライブラリ化
+
+  TINET のライブラリ化は、メモリ使用量を削減することを目的に実装してい
+る。このため、ライブラリ化されているのは ITRON TCP/IP API 部分のみであ
+り、TINET のコア部分のライブラリ化は行われていない。また、コンパイル時
+オプションにより、処理内容が変わるため、ライブラリも再構築する必要があ
+る。従って、ライブラリとアプリケーションプログラムを別々に構築しておき、
+後でリンクする方法はサポートしていない。 
+  ITRON TCP/IP API 部分もライブラリ化させないためには、 アプリケーショ
+ンの Makefile に NO_USE_TINET_LIBRARY = true を指定する。
+
+6. 6  TCP ヘッダのトレース出力機能
+
+  送受信する TCP セグメントの TCP ヘッダと TCP 通信端点の情報を出力す
+る機能である。なお、 CONSOLE_PORTID で指定されるシリアルポートに直接出
+力するので、 SYSLOG 出力が乱れることがある。受信時の出力例と意味を以下
+に示す。
+
+   <I 329.599=c: 4 s:CW f:60c00:--A---- a: 74461 s: 76082 w:58400 l:   0=
+
+   329.599       受信した時間、1/1000 秒単位、または 1 秒単位
+   c: 4          TCP 通信端点 ID
+   s:CW          TCP FSM 状態（tinet/netinet/tcp_fsm.h 参照）
+   f:60c00       TCP 通信端点の状態フラグ（16 進数、
+                 tinet/netinet/tcp_var.h 参照）
+   :--A----      TCP ヘッダのフラグフィールドの値（tinet/netinet/tcp.h
+                 参照）
+   a: 74461      TCP ヘッダの確認応答番号（コネクション確立時からの相
+                 対値）
+   s: 76082      TCP ヘッダのシーケンス番号（コネクション確立時からの
+                 相対値）
+   w:58400       TCP ヘッダのウインドサイズ
+   l:0           受信ペイロードデータ数
+
+  送信時の出力例と意味を以下に示す。 
+
+   =O 329.627=c: 4 s:CW f:60d20:--AP--- s: 74461 a: 76082 w: 2920 l:1460>
+
+   329.627       送信した時間、1/1000 秒単位、または 1 秒単位
+   c: 4          TCP 通信端点 ID
+   s:CW          TCP FSM 状態（tinet/netinet/tcp_fsm.h 参照）
+   f:60d20       TCP 通信端点の状態フラグ（16 進数、
+                 tinet/netinet/tcp_var.h 参照）
+   :--AP---      TCP ヘッダのフラグフィールドの値（tinet/netinet/tcp.h
+                 参照）
+   s: 74461      TCP ヘッダのシーケンス番号（コネクション確立時からの
+                 相対値）
+   a: 76082      TCP ヘッダの確認応答番号（コネクション確立時からの相
+                 対値）
+   w: 2920       TCP ヘッダのウインドサイズ
+   l:1460        送信ペイロードデータ数
+
+  この機能に関係するコンパイル時コンフィギュレーションパラメータを、以
+下に示す。
+
+   (1)   TCP_CFG_TRACE
+         TCP ヘッダのトレース出力機能を組込む。
+
+   (2)   TCP_CFG_TRACE_IPV4_RADDR
+         トレース出力対象のリモートホストの IPv4 アドレスを指定する。
+         IPV4_ADDRANY を指定すると、全てのホストを対象とする。
+
+   (3)   TCP_CFG_TRACE_LPORTNO
+         トレース出力対象のローカルホストのポート番号を指定する。
+         TCP_PORTANY を指定すると、全てのポート番号を対象にする。
+
+   (4)   TCP_CFG_TRACE_RPORTNO
+         トレース出力対象のリモートホストのポート番号を指定する。
+         TCP_PORTANY を指定すると、全てのポート番号を対象にする。
+
+6. 7  IPv6におけるアドレス管理とPath MTUへの対応
+
+  TINET リリース 1.3 まで、IPv6 におけるアドレス管理は限定的な対応のみ
+であり、 Path MTU にも対応していなかったが、ホスト情報のキャッシュを実
+装することにより、TINET リリース 1.4 からは、ほぼ完全に対応した。
+  この機能に関係するコンパイル時コンフィギュレーションパラメータを、以
+下に示す。
+
+   (1)   NUM_IN6_IFADDR_ENTRY
+         インタフェースのアドレスリスト（IPv6）のエントリ数である。
+
+   (2)   NUM_ND6_DEF_RTR_ENTRY
+         ディフォルトルータリストのエントリ数で、最大値は 16 である。0
+         を指定するとルータ通知を受信しない。ただし、現在は、 ルータ通
+         知の受信以外にサイトローカルアドレス等を設定する方法がない。 
+
+   (3)   NUM_ND6_PREFIX_ENTRY
+         プレフィックスリストのエントリ数で、最大値は 16 である。
+
+   (4)   NUM_IN6_HOSTCACHE_ENTRY
+         IPv6 用ホスト情報キャッシュのエントリ数で、 0 を指定すると
+         IPv6 用ホスト情報キャッシュを組込まない。また、この場合、Path
+         MTU への対応も限定的になる。
+
+6. 8  IPv6/IPv4完全デュアルスタック
+
+  TINET リリース 1.5 まで、 組込み可能なネットワーク層は IPv6 か IPv4
+のいずれかであったが、 TINET リリース 1.7 からは両方を組込むことがが可
+能になった。
+  ネットワーク層として IPv6 を選択した場合は、 IPv6 の API における
+IPv6 アドレスとして IPv4 射影アドレスを使用することが可能である。
+  この機能を有効にするコンパイル時コンフィギュレーションパラメータを、
+以下に示す。
+   API_CFG_IP4MAPPED_ADDR
+このコンパイル時コンフィギュレーションパラメータをしない時は、以下の示
+す API の引数として IPv4 射影アドレスを指定すると、 戻り値として E_PAR
+が返される。
+
+   [1]   tcp_cre_rep
+   [2]   tcp_acp_cep
+   [3]   tcp_con_cep
+   [4]   udp_cre_cep
+   [5]   udp_snd_dat
+
+7.  TINET 独自 API
+
+7. 1  ネットワーク統計情報
+
+  送受信オクテット数、 送受信パケット数等の統計情報のカウンタ
+（net_count）が、単純変数、構造体、配列により組込まれている。
+
+   (1)   ネットワーク統計情報の有効化
+           コンパイル時コンフィギュレーション・ファイルのいずれかで、
+         プロトコル毎にネットワーク統計情報を有効にする事が必要である。
+         有効にするためには、マクロ NET_COUNT_ENABLE に、 プロトコル識
+         別フラグ（インクルードファイル net/net.h で定義されている）を
+         ビット論理和により設定する。
+
+   (2)   ネットワーク統計情報の標準データ型と標準構造体
+           いずれもインクルードファイル net/net_count.h に定義されている。
+
+            typedef UD T_NET_COUNT_VAL;
+            
+            typedef struct t_net_count {
+                  T_NET_COUNT_VAL   in_octets;        /* 受信オクテット数     */
+                  T_NET_COUNT_VAL   out_octets;       /* 送信オクテット数     */
+                  T_NET_COUNT_VAL   in_packets;       /* 受信バケット数 */
+                  T_NET_COUNT_VAL   out_packets;      /* 送信バケット数 */
+                  T_NET_COUNT_VAL   in_err_packets;   /* 受信エラーバケット数 */
+                  T_NET_COUNT_VAL   out_err_packets;  /* 送信エラーバケット数 */
+                  } T_NET_COUNT;
+
+   (3)   プロトコル毎のネットワーク統計情報
+           以下に、 プロトコル毎のネットワーク統計情報の変数または配列
+         を示す。（）内はインクルードファイル net/net.h に定義されてい
+         るプロトコル識別フラグである。また、配列変数の場合、 配列の内
+         容は、インクルードファイル net/net_count.h を参照すること。
+
+         [1]   PPP の HDLC（PROTO_FLG_PPP_HDLC）
+                 標準構造体変数で、変数名は net_count_hdlc である。
+
+         [2]   PPP の認証プロトコル（PROTO_FLG_PPP_PAP）
+                 標準データ型変数で、 変数名は、受信オクテット数が
+
+                  net_count_ppp_upap_in_octets
+
+               送信オクテット数が
+
+                  net_count_ppp_upap_out_octets
+
+         [3]   PPP のリンク制御プロトコル（PROTO_FLG_PPP_LCP）
+                 標準データ型変数で、変数名は、 受信オクテット数が
+
+                  net_count_ppp_lcp_in_octets
+
+               送信オクテット数が
+
+                  net_count_ppp_lcp_out_octets
+
+         [4]   PPP の IP 依存制御プロトコル（PROTO_FLG_PPP_IPCP）
+                 標準データ型変数で、 変数名は、受信オクテット数が
+
+                  net_count_ppp_ipcp_in_octets
+
+               送信オクテット数が
+
+                  net_count_ppp_ipcp_out_octets
+
+         [5]   PPP 全体（PROTO_FLG_PPP）
+                 PPP 全体のネットワーク統計情報は、 標準構造体変数で、
+               変数名は net_count_ppp である。 また、 PPP での net_buf
+               の割当て失敗数は、 標準データ型変数で、 変数名は
+               net_count_ppp_no_buf である。
+
+         [6]   ループバックインタフェース（PROTO_FLG_LOOP）
+                 標準構造体変数で、変数名は net_count_loop である。
+
+         [7]   イーサネットディバイスドライバ NIC（PROTO_FLG_ETHER_NIC）
+                 標準データ型配列変数で、 変数名は net_count_ether_nic
+               である。
+
+         [8]   （PROTO_FLG_ETHER）
+                 標準構造体変数で、変数名は net_count_ether である。
+
+         [9]   （PROTO_FLG_ARP）
+                 標準構造体変数で、変数名は net_count_arp である。
+
+         [10]  （PROTO_FLG_IP4）
+                 標準データ型配列変数で、変数名は net_count_ip4 である。
+
+         [11]  （PROTO_FLG_IP6）
+                 標準データ型配列変数で、変数名は net_count_ip6 である。
+
+         [12]  （PROTO_FLG_ICMP4）
+                 標準構造体変数で、変数名は net_count_icmp4 である。
+
+         [13]  （PROTO_FLG_ICMP6）
+                 標準データ型配列変数で、変数名は net_count_icmp6 である。
+
+         [14]  （PROTO_FLG_ND6）
+                 標準データ型配列変数で、変数名は net_count_nd6 である。
+
+         [15]  （PROTO_FLG_UDP）
+                 標準構造体変数で、変数名は net_count_udp である。
+
+         [16]  （PROTO_FLG_TCP）
+                 標準データ型配列変数で、変数名は net_count_tcp である。
+
+         [17]  （PROTO_FLG_NET_BUF）
+                 net_buf に関しては、 特殊であるためサンプルアプリケー
+               ション nserv で使用している netapp/dbg_cons.c の関数
+               net_count を参照すること。
+
+7. 2  SNMP 用管理情報ベース（MIB）
+
+  コンパイル時コンフィギュレーション・ファイルのいずれかで、 マクロ
+SUPPORT_MIB を定義することにより、SNMP 用管理情報ベース（MIB）に準拠し
+たネットワーク統計の取得が可能である。ただし、TINET 自体は、管理情報ベー
+ス（MIB）に準拠したネットワーク統計を提供するだけで，SNMP をサポートし
+ていない。また、RFC1213、RFC2465、RFC2466 に定義されている全ての情報が
+取得できるわけではない。取得できる情報は、関係するインクルードファイル
+の構造体の定義を参照すること。
+  以下に、グループ、構造体を定義しているインクルードファイル、構造体名、
+構造体変数名を示す。
+
+   (1)   TCP グループ
+
+            インクルードファイル    netinet/tcp_var.h
+            構造体名                T_TCP_STATS
+            変数名                  tcp_stats
+
+   (2)   UDP グループ
+
+            インクルードファイル    netinet/udp_var.h
+            構造体名                T_UDP_STATS
+            変数名                  udp_stats
+
+   (3)   ICMPv4 グループ
+
+            インクルードファイル    netinet/icmp_var.h
+            構造体名                T_ICMP_STATS
+            変数名                  icmp_stats
+
+   (4)   IPv4 グループ
+
+            インクルードファイル    netinet/ip_var.h
+            構造体名                T_IP_STATS
+            変数名                  ip_stats
+
+   (5)   ICMPv6 グループ
+
+            インクルードファイル    netinet/icmp6.h
+            構造体名                T_ICMP6_IFSTAT
+            変数名                  icmp6_ifstat
+
+   (6)   IPv6 グループ
+
+            インクルードファイル    netinet6/ip6_var.h
+            構造体名                T_IN6_IFSTAT
+            変数名                  in6_ifstat
+
+   (7)   ネットワークインタフェース（イーサネット）グループ
+
+            インクルードファイル    net/if_var.h
+            構造体名                T_IF_STATS
+            変数名                  if_stats
+
+7. 3  TINET 内部アクセス関数、サポート関数、全域変数とマクロ
+
+  応用プログラムから TINET 内部にアクセスするための関数、 サポート関数、
+全域変数とマクロである。
+
+   (1)   IPv6 アドレスをリテラル表現（文字列）に変換する関数
+         【C 言語 API】
+               char *p_retbuf = ipv62str (char *p_buf, const T_IN6_ADDR *p_addr);
+
+         【パラメータ】
+               char           buf       リテラル表現のIPv6アドレスを格納するバッファ
+               const T_IN6_ADDR         addr      IPv6アドレス
+
+         【リターンパラメータ】
+               char           retbuf    リテラル表現の IPv6 アドレスが格納されたバッファ
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 IPv6 アドレスをリテラル表現（文字列）に変換する。パラ
+               メータ buf には、最低 46 バイトの領域が必要である。また、
+               パラメータ buf に、 NULL を指定すると、TINET 内部で確保
+               してあるバッファに IPv6 アドレスをリテラル表現に変換し
+               て書き込み、そのアドレスを返す。 コンパイル時コンフィギュ
+               レーションパラメータ NUM_IPADDR_STR_BUFF によりバッファ
+               数を指定することが出来る。 ただし、バッファ数を超えて連
+               続的に呼出すとバッファを上書きする。 
+
+   (2)   設定可能な最大 IPv6 アドレス数を返す関数
+         【C 言語 API】
+               u_int num = in6_get_maxnum_ifaddr (void);
+
+         【リターンパラメータ】
+               u_int          num       設定可能な最大IPv6アドレス数
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 ネットワークインタフェースに設定可能な最大 IPv6 アド
+               レス数を返す関数である。 なお、 現在設定されている IPv6
+               アドレス数とは異なる。
+
+   (3)   設定されている IPv6 アドレスを返す関数
+         【C 言語 API】
+               const T_IN6_ADDR *p_addr = in6_get_ifaddr (int_t index);
+
+         【パラメータ】
+               int_t     index     IPv6アドレスのインデックス値
+
+         【リターンパラメータ】
+               T_IN6_ADDR     addr      設定されているIPv6アドレスが格納されたバッファ
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 ネットワークインタフェースに設定されている IPv6 アド
+               レスを返す関数である。ただし、 未定義の場合は NULL を返
+               す。 index には 0 ～ ( 設定可能な最大 IPv6 アドレス数
+               -1) を指定できる。
+
+   (4)   設定されている IPv6 アドレスを更新する関数
+         【C 言語 API】
+               ER ercd = in6_upd_ifaddr (T_IN6_ADDR *p_addr,
+                                         uint_t prefixlen,
+                                         uint32_t vltime,
+                                         uint32_t pltime);
+
+         【パラメータ】
+               T_IN6_ADDR          addr      更新するIPv6アドレス
+               int_t     prefixlen プレフィックス長
+               int32_t   vltime    有効時間（単位は秒）
+               int32_t   pltime    推奨有効時間（単位は秒）
+
+         【リターンパラメータ】
+               ER        ercd      エラーコード
+
+         【エラーコード】
+               E_OBJ               空きがない。
+               E_PAR               パラメータエラー（p_addrがNULL等）。
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 ネットワークインタフェースに設定されている IPv6 アド
+               レスのプレフィックス長、有効時間、 推奨有効時間を更新す
+               る。 ただし、未定義の場合は追加する。
+
+   (5)   設定されている IPv6 アドレスを削除する関数
+         【C 言語 API】
+               ER ercd = in6_del_ifaddr (T_IN6_ADDR *p_addr);
+
+         【パラメータ】
+               T_IN6_ADDR          addr      削除するIPv6アドレス
+
+         【リターンパラメータ】
+               ER        ercd      エラーコード
+
+         【エラーコード】
+               E_PAR               パラメータエラー（指定されたアドレスがない等）。
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 ネットワークインタフェースに設定されている IPv6 アド
+               レスを削除する。
+
+   (6)   設定可能な最大 IPv4 アドレス数を返す関数
+         【C 言語 API】
+               uint_t num = in4_get_maxnum_ifaddr (void);
+
+
+         【リターンパラメータ】
+               uint_t         num       設定可能な最大IPv4アドレス数を返す関数
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 ネットワークインタフェースに設定可能な最大 IPv4 アド
+               レス数を返す関数である。なお、現在は常に 1 を返す。 
+
+   (7)   インタフェースに IPv4 アドレスを設定する関数
+         【C 言語 API】
+               ER ercd = in4_add_ifaddr (T_IN4_ADDR addr, T_IN4_ADDR mask);
+
+         【パラメータ】
+               T_IN4_ADDR          addr      IPアドレス
+               T_IN4_ADDR          mask      サブネットマスク
+
+         【リターンパラメータ】
+               ER        ercd      エラーコード（現在は常にE_OK）
+
+         【エラーコード】
+               E_OK                現在は常にE_OK
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 インタフェースに IPv4 アドレスを設定する。
+
+   (8)   IPv4 用静的経路表に経路情報を設定する関数
+         【C 言語 API】
+               ER ercd = in4_add_route (int index, T_IN4_ADDR target,
+                                                   T_IN4_ADDR mask,
+                                                   T_IN4_ADDR gateway);
+
+         【パラメータ】
+               int       index     エントリのインデックス
+               T_IN4_ADDR          target    目標ネットワークのIPアドレス
+               T_IN4_ADDR          mask      目標ネットワークのサブネットマスク
+               T_IN4_ADDR          gateway   ゲートウェイのIPアドレス
+
+         【リターンパラメータ】
+               ER        ercd      エラーコード
+
+         【エラーコード】
+               E_PAR               引数indexの値が負か、コンパイル時コンフィギュレーション
+                                   パラメータNUM_ROUTE_ENTRY以上のときE_PAR
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 IPv4 用静的経路表に経路情報を設定する。
+
+   (9)   IPv4 アドレスをリテラル表現（文字列）に変換する関数
+         【C 言語 API】
+               char *p_retbuf = ip2str (char *p_buf, const T_IN4_ADDR *p_ipaddr);
+
+         【パラメータ】
+               char           buf       リテラル表現のIPv4アドレスを格納するバッファ
+               const T_IN4_ADDR         ipaddr    IPv4アドレス
+
+         【リターンパラメータ】
+               char           retbuf    リテラル表現の IPv4 アドレスが格納されたバッファ
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 IPv4 アドレスをリテラル表現（文字列）に変換する。パラ
+               メータ buf には、最低 16 バイトの領域が必要である。また、
+               パラメータ buf に、 NULL を指定すると、TINET 内部で確保
+               してあるバッファに IPv4 アドレスをリテラル表現に変換し
+               て書き込み、そのアドレスを返す。 コンパイル時コンフィギュ
+               レーションパラメータ NUM_IPADDR_STR_BUFF によりバッファ
+               数を指定することが出来る。 ただし、バッファ数を超えて連
+               続的に呼出すとバッファを上書きする。 
+
+   (10)  ITRON TCP/IP API 機能コードを文字表現に変換する関数
+         【C 言語 API】
+               const char *p_str = in_strtfn (FN fncd);
+
+         【パラメータ】
+               FN        fncd      ITRON TCP/IP API 機能コード
+
+         【リターンパラメータ】
+               const char          str       ITRON TCP/IP API 機能コードの文字表現
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 ITRON TCP/IP API 機能コードを文字表現に変換する。
+
+   (11)  MAC アドレスをリテラル表現（文字列）に変換する関数
+         【C 言語 API】
+               char *p_retbuf = mac2str (char *p_buf, uint8_t *p_macaddr);
+
+         【パラメータ】
+               char      buf       リテラル表現のMACアドレスを格納するバッファ
+               uint8_t   macaddr   MACアドレス
+
+         【リターンパラメータ】
+               char      retbuf    リテラル表現の MAC アドレスが格納されたバッファ
+
+         【インクルードファイル】
+               <sil.h>   TOPPERS/ASP では必要
+               <net/net.h>
+
+         【機能】
+                 MAC アドレスをリテラル表現（文字列）に変換する。 パラ
+               メータ buf には、最低 18 バイトの領域が必要である。また、
+               パラメータ buf に、NULL を指定すると、 TINET 内部で確保
+               してあるバッファに MAC アドレスをリテラル表現に変換して
+               書き込み、 そのアドレスを返す。コンパイル時コンフィギュ
+               レーションパラメータ NUM_MACADDR_STR_BUFF によりバッファ
+               数を指定することが出来る。ただし、 バッファ数を超えて連
+               続的に呼出すとバッファを上書きする。 
+
+   (12)  IPv4 アドレスを IPv6 の IPv4 射影アドレスに変換する関数
+         【C 言語 API】
+               T_IN6_ADDR *p_dstaddr = in6_make_ipv4mapped (T_IN6_ADDR *dst,
+                                                            T_IN4_ADDR src);
+
+         【パラメータ】
+               T_IN6_ADDR          *dst      格納先のIPv6アドレス変数へのポインタ
+               T_IN4_ADDR          src       変換するIPv4アドレス
+
+         【リターンパラメータ】
+               T_IN6_ADDR          *p_dstaddr                                        格納先のIPv6アドレス変数へのポインタ
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 IPv4 アドレスを IPv6 の IPv4 射影アドレスに変換する。
+
+   (13)  指定した IPv6 アドレスが IPv4 射影アドレスかを判定する関数
+         【C 言語 API】
+               bool_t ret = in6_is_addr_ipv4mapped (const T_IN6_ADDR *addr);
+
+         【パラメータ】
+               T_IN6_ADDR          *p_dstaddr                                        判定するIPv6アドレス変数へのポインタ
+
+         【リターンパラメータ】
+               bool_t    ret       IPv6アドレスがIPv4射影アドレスであればtrueが返される。
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 指定した IPv6 アドレスが IPv4 射影アドレスかを判定す
+               る。IPv6 アドレスが IPv4 射影アドレスであれば true が返
+               される。
+
+   (14)  IPv6 の特殊なアドレスに対応する全域変数
+         【C 言語 API】
+               const T_IN6_ADDR in6_addr_unspecified;
+               const T_IN6_ADDR in6_addr_linklocal_allnodes;
+               const T_IN6_ADDR in6_addr_linklocal_allrouters;
+
+         【機能】
+                 IPv6 では、アドレス長が 128 ビット（16 バイト）で、値
+               をマクロで定義することができないために用意した全域変数
+               であり、以下のように、 メモリ操作関数を呼び出してコピーする。
+                  memcpy(&myaddr.ipaddr, &in6_addr_unspecified, sizeof(T_IN6_ADDR));
+
+   (15)  IPv6 の IPV6_ADDRANY に対応する全域変数
+         【C 言語 API】
+               const T_IN6_ADDR ipv6_addrany;
+
+         【機能】
+                 T_IPV6EP の ipaddr フィールドに、値 IPV4_ADDRANY を代
+               入するとき、IPv4 では、
+                  myaddr.ipaddr = IPV4_ADDRANY;
+
+               と指定できるが、IPv6 では、同様の指定ができないために用
+               意した全域変数であり、 以下のように、メモリ操作関数を呼
+               び出してコピーする。
+                  memcpy(&myaddr.ipaddr, &ipv6_addrany, sizeof(T_IN6_ADDR));
+
+               なお、この全域変数はマクロで定義している。 
+
+   (16)  TINET のバージョン情報マクロ
+         【C 言語 API】
+               TINET_PRVER
+
+         【ビット配分】
+               ビット12～15        メジャーリリース（現在の値は1）
+               ビット4～11         マイナーリリース（現在の値は7）
+               ビット3～0          パッチレベル（現在の値は0）
+
+         【インクルードファイル】
+               <net/net.h>
+
+   (17)  8 ビット毎に指定した IPv4 アドレスを 32 ビットにするマクロ
+         【C 言語 API】
+               T_IN4_ADDR addr = MAKE_IPV4_ADDR(uint8_t a, uint8_t b,
+                                                uint8_t c, uint8_t d);
+
+         【パラメータ】
+               uint8_t   a         IPv4アドレスのビット24～31
+               uint8_t   b         IPv4アドレスのビット16～23
+               uint8_t   c         IPv4アドレスのビット8～15
+               uint8_t   d         IPv4アドレスのビット0～7
+
+         【リターンパラメータ】
+               T_IN4_ADDR          addr      32ビットのIPv4アドレス
+
+         【インクルードファイル】
+               <netinet/in.h>
+
+         【機能】
+                 各オクテットの値から IPv4 アドレスを生成する。
+
+   (18)  一般定数マクロ
+
+         TCP_REP_NONE        該当する TCP 受付口が無い。値は（0）。
+         TCP_CEP_NONE        該当する TCP 通信端点が無い。値は（0）。
+         UDP_CEP_NONE        該当する UDP 通信端点が無い。値は（0）。
+
+7. 4  応用プログラムコールバック関数
+
+  TINET から呼出される応用プログラムコールバック関数であり、応用プログ
+ラム側で用意する必要がある。
+
+   (1)   IPv4 アドレス重複検出時のコールバック関数
+         【C 言語 API】
+               boot_t reply = arp_callback_duplicated(uint8_t *shost);
+
+         【パラメータ】
+               uint8_t   shost     重複相手のMACアドレス
+
+         【リターンパラメータ】
+               bool_t    reply     重複の通知
+
+         【インクルードファイル】
+               <netinet/if_ether.h>
+
+         【コンパイル時コンフィギュレーションパラメータ】
+               ARP_CFG_CALLBACK_DUPLICATED
+
+         【機能】
+                 戻り値に TRUE を指定すると、TINET で重複相手の MAC ア
+               ドレスを syslog に出力し、 重複相手にも重複したことを伝
+               える。FALSE を指定すると何もしない。
+
+8.  謝辞
+
+  本 TCP/IP プロトコルスタックは、次の組織の皆様の御支援により研究・開
+発を行いました。関係各位に感謝いたします。 
+
+   (1)   財団法人道央産業技術振興機構様
+
+         [1]   事業名（実施年度）
+               高度技術開発委託事業（平成 12 年度）
+         [2]   テーマ名
+               組込み型制御システム用 TCP/IP プロトコルスタックの開発
+
+   (2)   株式会社 NTT ドコモ北海道苫小牧支店様
+   (3)   経済産業省東北経済産業局（委託先管理法人: 財団法人みやぎ産業
+         振興機構）様
+
+         [1]   事業名（実施年度）
+               地域新生コンソーシアム研究開発事業（平成14年度～15年度）
+         [2]   テーマ名
+               組込みシステム・オープンプラットホームの構築とその実用化開発
+
+   (4)   宮城県産業技術総合センター様
+   (5)   TOPPERS プロジェクト様
+   (6)   株式会社ヴィッツ様
+   (7)   財団法人電気・電子情報学術振興財団様
+
+         [1]   第 6 回 LSI IP デザイン・アワード IP 受賞
+              （2004 年、 平成 16 年 5 月 20 日）
+               オープンソースの組込みシステム用 TCP/IP
+               プロトコルスタック : TINET
+         [2]   第 7 回 LSI IP デザイン・アワード IP 受賞
+              （2005 年、 平成 17 年 5 月 19 日）
+               組込みシステム用 IP バージョン 6 対応 TCP/IP
+               プロトコルスタック : TINET-1.2
+
+   (8)   株式会社北斗電子様
+   (9)   有限会社品川通信計装サービス様
+   (10)  北海道立工業試験場様
+
+         [1]   事業名（実施年度）
+               重点領域特別研究（平成 17 年度～ 18 年度）
+         [2]   テーマ名
+               組込みシステム向けネットワーク接続ソフトウェア群の開発
+
+   (11)  総務省北海道総合通信局様
+
+         [1]   事業名（実施年度）
+               戦略的情報通信研究開発推進制度【SCOPE】「地域 ICT 振興
+               型研究開発」（平成 22 年度～平成 23 年度）
+         [2]   テーマ名
+               ユビキタスサービスプラットフォームに対応した組込みシス
+               テム用 TCP/IP プロトコルスタックとサポートシステムの研究開発
+
+   (12)  ルネサスエレクトロニクス株式会社様
+
+   (13)  経済産業省北海道経済産業局様
+
+         [1]   事業名（実施年度）
+               中小企業経営支援等対策費補助金「戦略的基盤技術高度化支援事業」
+               （平成 26 年度～平成 28 年度）
+         [2]   テーマ名
+               農業機械のさらなる高度化と海外進出に資する
+               次世代電子制御ソフトウェア基盤の開発
+
+9.  ライセンス
+
+  TINET は FreeBSD を元に開発を行ったため、 TINET を含むソフトウェアを、
+他のソフトウェア開発に使用できない形で再配布する場合（TOPPERS ライセン
+ス (3) に規程されている形態）は、 TOPPERS ライセンス (3) の (b) の報告
+だけでは不十分で、(a) による方法が必要である。
+  以下に示す TOPPERS、 FreeBSD および FreeBSD へのソフトウェアの寄贈者
+のライセンス規定に従って、再配布に伴うドキュメント（利用者マニュアルな
+ど）に、ライセンス表示を行うと。
+
+(1)FreeBSD
+
+   /*
+    * Copyright (c) 1980, 1986, 1993
+    *    The Regents of the University of California.  All rights reserved.
+    *
+    * Redistribution and use in source and binary forms, with or without
+    * modification, are permitted provided that the following conditions
+    * are met:
+    * 1. Redistributions of source code must retain the above copyright
+    *    notice, this list of conditions and the following disclaimer.
+    * 2. Redistributions in binary form must reproduce the above copyright
+    *    notice, this list of conditions and the following disclaimer in the
+    *    documentation and/or other materials provided with the distribution.
+    * 3. All advertising materials mentioning features or use of this software
+    *    must display the following acknowledgement:
+    *    This product includes software developed by the University of
+    *    California, Berkeley and its contributors.
+    * 4. Neither the name of the University nor the names of its contributors
+    *    may be used to endorse or promote products derived from this software
+    *    without specific prior written permission.
+    *
+    * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+    * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+    * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    * SUCH DAMAGE.
+    */
+
+(2)KAME
+
+   /*
+    * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
+    * All rights reserved.
+    *
+    * Redistribution and use in source and binary forms, with or without
+    * modification, are permitted provided that the following conditions
+    * are met:
+    * 1. Redistributions of source code must retain the above copyright
+    *    notice, this list of conditions and the following disclaimer.
+    * 2. Redistributions in binary form must reproduce the above copyright
+    *    notice, this list of conditions and the following disclaimer in the
+    *    documentation and/or other materials provided with the distribution.
+    * 3. Neither the name of the project nor the names of its contributors
+    *    may be used to endorse or promote products derived from this software
+    *    without specific prior written permission.
+    *
+    * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+    * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+    * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    * SUCH DAMAGE.
+    */
+
+(3)イーサネット・ディバイスドライバ
+
+   /*
+    * Copyright (c) 1995, David Greenman
+    * All rights reserved.
+    *
+    * Redistribution and use in source and binary forms, with or without
+    * modification, are permitted provided that the following conditions
+    * are met:
+    * 1. Redistributions of source code must retain the above copyright
+    *    notice unmodified, this list of conditions, and the following
+    *    disclaimer.
+    * 2. Redistributions in binary form must reproduce the above copyright
+    *    notice, this list of conditions and the following disclaimer in the
+    *    documentation and/or other materials provided with the distribution.
+    *
+    * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+    * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+    * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    * SUCH DAMAGE.
+    *
+    * $FreeBSD: src/sys/i386/isa/if_ed.c,v 1.148.2.4 1999/09/25 13:08:18 nyan Exp $
+    */
+   
+   /*
+    * Device driver for National Semiconductor DS8390/WD83C690 based ethernet
+    *   adapters. By David Greenman, 29-April-1993
+    *
+    * Currently supports the Western Digital/SMC 8003 and 8013 series,
+    *   the SMC Elite Ultra (8216), the 3Com 3c503, the NE1000 and NE2000,
+    *   and a variety of similar clones.
+    *
+    */
+
+(4)/usr/sbin/ppp
+
+   /*
+    *                      User Process PPP
+    *
+    *          Written by Toshiharu OHNO (tony-o@iij.ad.jp)
+    *
+    *   Copyright (C) 1993, Internet Initiative Japan, Inc. All rights reserverd.
+    *
+    * Redistribution and use in source and binary forms are permitted
+    * provided that the above copyright notice and this paragraph are
+    * duplicated in all such forms and that any documentation,
+    * advertising materials, and other materials related to such
+    * distribution and use acknowledge that the software was developed
+    * by the Internet Initiative Japan, Inc.  The name of the
+    * IIJ may not be used to endorse or promote products derived
+    * from this software without specific prior written permission.
+    * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+    * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+    * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+    */
+
+(5)/usr/sbin/pppd
+
+   /*
+    * main.c - Point-to-Point Protocol main module
+    *
+    * Copyright (c) 1989 Carnegie Mellon University.
+    * All rights reserved.
+    *
+    * Redistribution and use in source and binary forms are permitted
+    * provided that the above copyright notice and this paragraph are
+    * duplicated in all such forms and that any documentation,
+    * advertising materials, and other materials related to such
+    * distribution and use acknowledge that the software was developed
+    * by Carnegie Mellon University.  The name of the
+    * University may not be used to endorse or promote products derived
+    * from this software without specific prior written permission.
+    * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+    * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+    * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+    */
+
+(6)TOPPERS/ASP
+
+   /*
+    *  TOPPERS/ASP Kernel
+    *      Toyohashi Open Platform for Embedded Real-Time Systems/
+    *      Advanced Standard Profile Kernel
+    * 
+    *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
+    *                              Toyohashi Univ. of Technology, JAPAN
+    *  Copyright (C) 2004-2013 by Embedded and Real-Time Systems Laboratory
+    *              Graduate School of Information Science, Nagoya Univ., JAPAN
+    * 
+    *  上記著作権者は，以下の(1)～(4)の条件を満たす場合に限り，本ソフトウェ
+    *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+    *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+    *  (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+    *      権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+    *      スコード中に含まれていること．
+    *  (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+    *      用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+    *      者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+    *      の無保証規定を掲載すること．
+    *  (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+    *      用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+    *      と．
+    *    (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+    *        作権表示，この利用条件および下記の無保証規定を掲載すること．
+    *    (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+    *        報告すること．
+    *  (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+    *      害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+    *      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+    *      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+    *      免責すること．
+    * 
+    *  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+    *  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+    *  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+    *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+    *  の責任を負わない．
+    * 
+    *  $Id: kernel.h 2541 2013-10-13 15:16:25Z ertl-hiro $
+    */
+
+(7)TOPPERS/JSP
+
+   /*
+    *  TOPPERS/JSP Kernel
+    *      Toyohashi Open Platform for Embedded Real-Time Systems/
+    *      Just Standard Profile Kernel
+    * 
+    *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
+    *                              Toyohashi Univ. of Technology, JAPAN
+    *  Copyright (C) 2004 by Embedded and Real-Time Systems Laboratory
+    *              Graduate School of Information Science, Nagoya Univ., JAPAN
+    * 
+    *  上記著作権者は，以下の (1)～(4) の条件か，Free Software Foundation 
+    *  によって公表されている GNU General Public License の Version 2 に記
+    *  述されている条件を満たす場合に限り，本ソフトウェア（本ソフトウェア
+    *  を改変したものを含む．以下同じ）を使用・複製・改変・再配布（以下，
+    *  利用と呼ぶ）することを無償で許諾する．
+    *  (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+    *      権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+    *      スコード中に含まれていること．
+    *  (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+    *      用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+    *      者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+    *      の無保証規定を掲載すること．
+    *  (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+    *      用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+    *      と．
+    *    (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+    *        作権表示，この利用条件および下記の無保証規定を掲載すること．
+    *    (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+    *        報告すること．
+    *  (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+    *      害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+    * 
+    *  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+    *  よびTOPPERSプロジェクトは，本ソフトウェアに関して，その適用可能性も
+    *  含めて，いかなる保証も行わない．また，本ソフトウェアの利用により直
+    *  接的または間接的に生じたいかなる損害に関しても，その責任を負わない．
+    * 
+    *  @(#) $Id: kernel.h,v 1.22 2007/05/08 07:33:51 honda Exp $
+    */
+
+(8)TOPPERS/ASP/CFG
+
+   /*
+    *  TOPPERS Software
+    *      Toyohashi Open Platform for Embedded Real-Time Systems
+    *
+    *  Copyright (C) 2007-2012 by TAKAGI Nobuhisa
+    * 
+    *  上記著作権者は，以下の(1)～(4)の条件を満たす場合に限り，本ソフトウェ
+    *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+    *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+    *  (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+    *      権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+    *      スコード中に含まれていること．
+    *  (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+    *      用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+    *      者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+    *      の無保証規定を掲載すること．
+    *  (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+    *      用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+    *      と．
+    *    (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+    *        作権表示，この利用条件および下記の無保証規定を掲載すること．
+    *    (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+    *        報告すること．
+    *  (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+    *      害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+    *      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+    *      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+    *      免責すること．
+    * 
+    *  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+    *  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+    *  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+    *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+    *  の責任を負わない．
+    * 
+    */
+
+(9)TINET
+
+   /*
+    *  TINET (TCP/IP Protocol Stack)
+    * 
+    *  Copyright (C) 2001-2016 by Dep. of Computer Science and Engineering
+    *                   Tomakomai National College of Technology, JAPAN
+    *
+    *  上記著作権者は，以下の(1)～(4)の条件を満たす場合に限り，本ソフトウェ
+    *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+    *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+    *  (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+    *      権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+    *      スコード中に含まれていること．
+    *  (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+    *      用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+    *      者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+    *      の無保証規定を掲載すること．
+    *  (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+    *      用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+    *      と．
+    *    (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+    *        作権表示，この利用条件および下記の無保証規定を掲載すること．
+    *  (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+    *      害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+    *      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+    *      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+    *      免責すること．
+    * 
+    *  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+    *  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+    *  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+    *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+    *  の責任を負わない．
+    * 
+    *  @(#) $Id: $
+    */

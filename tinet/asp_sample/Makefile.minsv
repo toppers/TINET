@@ -1,0 +1,67 @@
+#
+#  ネットワークサービスの定義
+#
+
+#  ネットワークインタフェースの選択、何れか一つ選択する。
+
+NET_IF = @(NET_IF)
+
+#  イーサネット・ディバイスドライバの選択
+
+NET_DEV = @(NET_DEV)
+
+#  ネットワーク層の選択
+
+@(SUPPORT_INET6)
+@(SUPPORT_INET4)
+
+#  API に組込む機能の選択
+
+@(API_CFG_IP4MAPPED_ADDR)
+
+#  トランスポート層の選択
+
+@(SUPPORT_TCP)
+@(SUPPORT_UDP)
+
+#
+#  サンプルのネットワーク応用プログラムに関する定義
+#
+
+#  TCP に組込む機能の選択
+TCP_CFG_RWBUF_CSAVE_ONLY = true
+TCP_CFG_SWBUF_CSAVE_ONLY = true
+
+#  TCP の機能と API の選択
+
+USE_COPYSAVE_API = true
+
+#  共通サーバプログラムの選択
+
+USE_WWW_SRV = true
+
+#  TCP エコーサーバプログラムの選択
+#    tcp_echo_srv1: 送受信タスク同一型
+
+TCP_ECHO_SRV = tcp_echo_srv1
+
+#  共通サーバタスク数の選択
+
+CDEFS := $(CDEFS) -DNUM_WWW_SRV_TASKS=1		# WWW サーバタスク数、最大 2
+CDEFS := $(CDEFS) -DNUM_TCP_ECHO_SRV_TASKS=1	# TCP ECHO サーバタスク数、最大 8
+
+#  TCP のセグメントサイズの選択
+
+CDEFS := $(CDEFS) -DUSE_TCP_MSS_SEG		# セグメントサイズを MSS にする。
+
+#
+#  サンプルのネットワーク応用プログラムの Makefile のインクルード
+#
+include $(SRCDIR)/tinet/netapp/Makefile.netapp
+
+#
+#  システムサービスの Makefile のインクルード
+#
+include $(SRCDIR)/tinet/Makefile.tinet
+
+#

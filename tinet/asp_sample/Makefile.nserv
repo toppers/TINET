@@ -1,0 +1,132 @@
+#
+#  ネットワークサービスの定義
+#
+
+#  ネットワークインタフェースの選択、何れか一つ選択する。
+
+NET_IF = @(NET_IF)
+
+#  イーサネット・ディバイスドライバの選択
+
+NET_DEV = @(NET_DEV)
+
+#  ネットワーク層の選択
+
+@(SUPPORT_INET6)
+@(SUPPORT_INET4)
+
+#  API に組込む機能の選択
+
+@(API_CFG_IP4MAPPED_ADDR)
+
+#  トランスポート層の選択
+
+@(SUPPORT_TCP)
+@(SUPPORT_UDP)
+
+#
+#  サンプルのネットワーク応用プログラムの選択
+#
+
+#  TCP に組込む機能の選択
+
+#TCP_CFG_RWBUF_CSAVE_ONLY = true
+TCP_CFG_RWBUF_CSAVE = true
+#TCP_CFG_SWBUF_CSAVE_ONLY = true
+TCP_CFG_SWBUF_CSAVE = true
+TCP_CFG_NON_BLOCKING = true
+TCP_CFG_EXTENTIONS = true
+
+#  TCP の機能と API の選択
+
+#USE_TCP_NON_BLOCKING = true
+#USE_TCP_EXTENTIONS = true
+USE_COPYSAVE_API = true
+
+#  UDP に組込む機能の選択
+
+UDP_CFG_NON_BLOCKING = true
+UDP_CFG_EXTENTIONS = true
+
+#  UDP の機能の選択
+
+#USE_UDP_EXTENTIONS = true
+
+#  UDP の機能の選択、両方同時には選択できない。
+
+#USE_UDP_NON_BLOCKING = true
+#USE_UDP_CALL_BACK = true
+
+#  共通サーバプログラムの選択
+
+USE_WWW_SRV = true
+USE_WWW4_SRV = true
+USE_UDP_ECHO_SRV = true
+USE_UDP4_ECHO_SRV = true
+USE_TCP_DISCARD_SRV = true
+
+#  TCP エコーサーバプログラムの選択、ただし、両方は選択できない。
+#    tcp_echo_srv1: 送受信タスク同一型
+#    tcp_echo_srv2: 送受信タスク分離型
+
+TCP_ECHO_SRV = tcp_echo_srv1
+#TCP_ECHO_SRV = tcp_echo_srv2
+
+USE_TCP4_ECHO_SRV = true
+
+#  コンソール入出力の選択
+
+# シリアル経由のみ
+USE_DBG_CONS = true
+
+# falseを指定すると、関数 dbg_parse() が必要である。
+USE_DBG_CONS_PARSER = true
+
+# シリアルとネットワーク経由
+# ただし、ノンブロッキングコールを組込んだ時有効
+USE_NET_CONS = true
+
+#  共通クライアントプログラムの選択
+
+USE_TCP_ECHO_CLI = true
+USE_TCP4_ECHO_CLI = true
+USE_UDP_ECHO_CLI = true
+USE_UDP4_ECHO_CLI = true
+USE_TCP_DISCARD_CLI = true
+USE_UDP_DISCARD_CLI = true
+USE_DHCP6_CLI = true
+USE_DHCP4_CLI = true
+USE_RESOLVER = true
+USE_PING = true
+
+#  共通サーバタスク数の選択
+
+CDEFS := $(CDEFS) -DNUM_WWW_SRV_TASKS=1		# WWW サーバタスク数、最大 2
+CDEFS := $(CDEFS) -DNUM_TCP_ECHO_SRV_TASKS=4	# TCP ECHO サーバタスク数、最大 8
+
+#  予約 ID 数の選択
+
+CDEFS := $(CDEFS) -DNUM_VRID_TCP6_REPS=2	# TCP/IPv6 受付口予約 ID 数、最大 2
+CDEFS := $(CDEFS) -DNUM_VRID_TCP6_CEPS=4	# TCP/IPv6 通信端点予約 ID 数、最大 4
+CDEFS := $(CDEFS) -DNUM_VRID_UDP6_CEPS=2	# UDP/IPv6 通信端点予約 ID 数、最大 2
+CDEFS := $(CDEFS) -DNUM_VRID_TCP4_REPS=2	# TCP/IPv4 受付口予約 ID 数、最大 2
+CDEFS := $(CDEFS) -DNUM_VRID_TCP4_CEPS=2	# TCP/IPv4 通信端点予約 ID 数、最大 4
+CDEFS := $(CDEFS) -DNUM_VRID_UDP4_CEPS=2	# UDP/IPv4 通信端点予約 ID 数、最大 2
+
+#  TCP のセグメントサイズの選択
+#CDEFS := $(CDEFS) -DUSE_TCP_MSS_SEG		# セグメントサイズを MSS にする。
+
+#  IPv6 MMTU サイズのネットワークバッファの選択
+#CDEFS := $(CDEFS) -DUSE_IPV6_MMTU
+
+#
+#  サンプルのネットワーク応用プログラムの Makefile のインクルード
+#
+include $(SRCDIR)/tinet/netapp/Makefile.netapp
+
+#
+#  システムサービスの Makefile のインクルード
+#
+include $(SRCDIR)/tinet/Makefile.tinet
+
+#
