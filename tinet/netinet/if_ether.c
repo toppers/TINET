@@ -231,7 +231,7 @@ reply:
 	/* Ethernet ARP ヘッダを設定する。*/
 	memcpy(et_arph->thost, et_arph->shost, ETHER_ADDR_LEN);
 	memcpy(et_arph->shost, ifaddr->lladdr, ETHER_ADDR_LEN);
-	memcpy(et_arph->tproto, (uint8_t*)&et_arph->sproto, sizeof(T_IN_ADDR));
+	memcpy(et_arph->tproto, (uint8_t*)&et_arph->sproto, IPV4_ADDR_LEN);
 	ahtonl(et_arph->sproto, taddr);
 
 	/* Ethernet ARP ヘッダを設定する。*/
