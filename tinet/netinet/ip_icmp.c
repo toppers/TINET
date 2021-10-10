@@ -235,8 +235,8 @@ icmp_unreach (T_NET_BUF *input, uint_t ihoff)
 	/* 最終ヘッダが TCP/UDP のみ対応する。*/
 	if (ip4h->proto == IPPROTO_TCP || ip4h->proto == IPPROTO_UDP) {
 
-		memmove(GET_IP4_HDR(input), ip4h, input->len - (IP4_HDR_SIZE + ICMP4_HDR_SIZE));
-		input->len -= IP4_HDR_SIZE + ICMP4_HDR_SIZE;
+		memmove(GET_IP4_HDR(input), ip4h, input->len - (ihoff + ICMP4_HDR_SIZE));
+		input->len -= ihoff + ICMP4_HDR_SIZE;
 
 #if defined(SUPPORT_TCP)
 
