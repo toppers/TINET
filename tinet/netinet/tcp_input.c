@@ -520,7 +520,21 @@ syn_sent (T_TCP_HDR *tcph, T_TCP_CEP *cep)
 			if (cep->snd_nblk_tfn == TFN_TCP_CON_CEP) {
 
 				/* 相手のアドレスをコピーする。*/
+
+#if defined(_IP6_CFG) && defined(_IP4_CFG)
+
+				if (cep->flags & TCP_CEP_FLG_IPV4) {
+					(*cep->p_dstaddr4).ipaddr = ntohl(cep->dstaddr.ipaddr.s6_addr32[3]);
+					(*cep->p_dstaddr4).portno = cep->dstaddr.portno;
+					}
+				else
+					*cep->p_dstaddr = cep->dstaddr;
+
+#else	/* of #if defined(_IP6_CFG) && defined(_IP4_CFG) */
+
 				*cep->p_dstaddr = cep->dstaddr;
+
+#endif	/* of #if defined(_IP6_CFG) && defined(_IP4_CFG) */
 
 				if (IS_PTR_DEFINED(cep->callback)) {
 
@@ -846,7 +860,21 @@ proc_ack1 (T_NET_BUF *input, T_TCP_CEP *cep, uint_t thoff, bool_t *needoutput)
 			if (cep->snd_nblk_tfn == TFN_TCP_CON_CEP) {
 
 				/* 相手のアドレスをコピーする。*/
+
+#if defined(_IP6_CFG) && defined(_IP4_CFG)
+
+				if (cep->flags & TCP_CEP_FLG_IPV4) {
+					(*cep->p_dstaddr4).ipaddr = ntohl(cep->dstaddr.ipaddr.s6_addr32[3]);
+					(*cep->p_dstaddr4).portno = cep->dstaddr.portno;
+					}
+				else
+					*cep->p_dstaddr = cep->dstaddr;
+
+#else	/* of #if defined(_IP6_CFG) && defined(_IP4_CFG) */
+
 				*cep->p_dstaddr = cep->dstaddr;
+
+#endif	/* of #if defined(_IP6_CFG) && defined(_IP4_CFG) */
 
 				if (IS_PTR_DEFINED(cep->callback)) {
 

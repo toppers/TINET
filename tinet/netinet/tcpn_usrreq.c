@@ -670,12 +670,12 @@ TCP_CON_CEP (ID cepid, T_IPEP *p_myaddr, T_IPEP *p_dstaddr, TMO tmout)
 		cep->p_dstaddr4   = p_dstaddr;
 		cep->p_myaddr4    = p_myaddr;
 		cep->p_dstaddr    = NULL;
-		cep->p_myaddr     = NULL;
+		cep->p_myaddr     = NADR;
 
 #else	/* of #if API_PROTO == API_PROTO_IPV4 */
 
 		cep->p_dstaddr4   = NULL;
-		cep->p_myaddr4    = NULL;
+		cep->p_myaddr4    = NADR;
 		cep->p_dstaddr    = p_dstaddr;
 		cep->p_myaddr     = p_myaddr;
 
