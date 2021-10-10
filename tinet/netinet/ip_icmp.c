@@ -313,7 +313,7 @@ icmp_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 	NET_COUNT_ICMP4(net_count_icmp4.in_packets, 1);
 
 	/* ICMP ヘッダの長さをチェックする。*/
-	if (input->len < IF_IP4_ICMP4_HDR_SIZE) {
+	if (input->len < *offp + ICMP4_HDR_SIZE) {
 		NET_COUNT_ICMP4(net_count_icmp4.in_err_packets, 1);
 		NET_COUNT_MIB(icmp_stats.icmpInErrors, 1);
 		goto buf_rel;
