@@ -191,7 +191,7 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 #if defined(TCP_CFG_SWBUF_CSAVE_ONLY)
 		
 	if (len > 0 && ((cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_SEND_READY ||
-	                (cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_SENT)) {
+					(cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_SENT)) {
 
 		/*
 		 *  送信ウインドバッファが開放されないようにして、
@@ -208,8 +208,8 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 		 */
 		len = 0;
 		if ((error = tcpn_get_segment(&output, cep, optlen,
-	                                    len, (uint_t)net_buf_max_siz(),
-	                                    NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
+										len, (uint_t)net_buf_max_siz(),
+										NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
 			if (cep->timer[TCP_TIM_REXMT] == 0)
 				cep->timer[TCP_TIM_REXMT] = cep->rxtcur;
 			goto err_ret;
@@ -220,15 +220,15 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 
 	if (IS_PTR_DEFINED(cep->sbuf)) {
 		if ((error = tcpn_get_segment(&output, cep, optlen,
-		                             len, (uint_t)net_buf_max_siz(),
-		                             NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
+									 len, (uint_t)net_buf_max_siz(),
+									 NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
 			if (cep->timer[TCP_TIM_REXMT] == 0)
 				cep->timer[TCP_TIM_REXMT] = cep->rxtcur;
 			goto err_ret;
 			}
 		}
 	else if (len > 0 && ((cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_SEND_READY ||
-	                     (cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_SENT)) {
+						 (cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_SENT)) {
 
 		/*
 		 *  送信ウインドバッファが開放されないようにして、
@@ -245,8 +245,8 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 		 */
 		len = 0;
 		if ((error = tcpn_get_segment(&output, cep, optlen,
-	                                    len, (uint_t)net_buf_max_siz(),
-	                                    NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
+										len, (uint_t)net_buf_max_siz(),
+										NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
 			if (cep->timer[TCP_TIM_REXMT] == 0)
 				cep->timer[TCP_TIM_REXMT] = cep->rxtcur;
 			goto err_ret;
@@ -256,8 +256,8 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 #else	/* of #if defined(TCP_CFG_SWBUF_CSAVE_ONLY) */
 
 	if ((error = tcpn_get_segment(&output, cep, optlen,
-	                             len, (uint_t)net_buf_max_siz(),
-	                             NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
+								 len, (uint_t)net_buf_max_siz(),
+								 NBA_SEARCH_ASCENT, TMO_TCP_GET_NET_BUF)) != E_OK) {
 		if (cep->timer[TCP_TIM_REXMT] == 0)
 			cep->timer[TCP_TIM_REXMT] = cep->rxtcur;
 		goto err_ret;
@@ -318,7 +318,7 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 	 *  セグメントを送信するが、SEQ は進めない。
 	 */
 	if ((flags & TCP_FLG_FIN) && (cep->flags & TCP_CEP_FLG_SENT_FIN) &&
-	    cep->snd_nxt == cep->snd_max) {
+		cep->snd_nxt == cep->snd_max) {
 		cep->snd_nxt --;
 		}
 
@@ -368,8 +368,10 @@ send_segment (bool_t *sendalot, T_TCP_CEP *cep, uint_t doff, uint_t win, uint_t 
 			tcph->urp    = htons((uint16_t)(cep->snd_up - cep->snd_nxt - 1));
 		tcph->flags |= TCP_FLG_URG;
 		}
-	else
+	else {
+		tcph->urp = 0;
 		cep->snd_up  = cep->snd_una;
+		}
 
 #endif	/* of #ifdef TCP_CFG_EXTENTIONS */
 
@@ -588,7 +590,7 @@ tcp_output (T_TCP_CEP *cep)
 				cep->timer[TCP_TIM_PERSIST] = 0;
 				cep->rxtshift = 0;
 				}
-		 	}
+			}
 
 		/*
 		 *  len: 今回送信するオクテット数
@@ -660,8 +662,8 @@ tcp_output (T_TCP_CEP *cep)
 			}
 
 		/*
-                 *        swbuf_count (送信バッファにあるオクテット数)
-                 *                                           |
+				 *        swbuf_count (送信バッファにあるオクテット数)
+				 *                                           |
 		 *    0                                      V
 		 *    +-------------------------------------------+
 		 *    |                    sbuf       |           |
@@ -711,8 +713,8 @@ tcp_output (T_TCP_CEP *cep)
 			 *  アイドルか非 PUSH オプションが有効なとき。
 			 */
 			if ((idle || (cep->flags & TCP_CEP_FLG_NO_DELAY)) &&
-			    (cep->flags & TCP_CEP_FLG_NO_PUSH) == 0 &&
-			    len + doff >= cep->swbuf_count) {
+				(cep->flags & TCP_CEP_FLG_NO_PUSH) == 0 &&
+				len + doff >= cep->swbuf_count) {
 				error = send_segment(&sendalot, cep, doff, win, (uint_t)len, flags);
 				continue;
 				}
@@ -731,8 +733,8 @@ tcp_output (T_TCP_CEP *cep)
 			 *      つまり、再送するとき。
 			 */
 			if ((cep->flags & TCP_CEP_FLG_FORCE) ||
-			    (len >= cep->max_sndwnd / 2 && cep->max_sndwnd > 0) ||
-			    SEQ_LT(cep->snd_nxt, cep->snd_max)) {
+				(len >= cep->max_sndwnd / 2 && cep->max_sndwnd > 0) ||
+				SEQ_LT(cep->snd_nxt, cep->snd_max)) {
 				error = send_segment(&sendalot, cep, doff, win, (uint_t)len, flags);
 				continue;
 				}
@@ -761,7 +763,7 @@ tcp_output (T_TCP_CEP *cep)
 				adv = MAX_TCP_WIN_SIZE - (cep->rcv_adv - cep->rcv_nxt);
 
 			if (adv     >= (long)(cep->maxseg * 2) ||
-			    adv * 2 >= (long) cep->rbufsz) {
+				adv * 2 >= (long) cep->rbufsz) {
 				error = send_segment(&sendalot, cep, doff, win, (uint_t)len, flags);
 				continue;
 				}
@@ -776,7 +778,7 @@ tcp_output (T_TCP_CEP *cep)
 			}
 
 		if ( (flags & TCP_FLG_RST) ||
-		    ((flags & TCP_FLG_SYN) && (cep->flags & TCP_CEP_FLG_NEED_SYN) == 0)) {
+			((flags & TCP_FLG_SYN) && (cep->flags & TCP_CEP_FLG_NEED_SYN) == 0)) {
 			error = send_segment(&sendalot, cep, doff, win, (uint_t)len, flags);
 			continue;
 			}
@@ -799,7 +801,7 @@ tcp_output (T_TCP_CEP *cep)
 		 *  セグメントを送信する。
 		 */
 		if ((flags & TCP_FLG_FIN) &&
-		    ((cep->flags & TCP_CEP_FLG_SENT_FIN) == 0 || cep->snd_nxt == cep->snd_una)) {
+			((cep->flags & TCP_CEP_FLG_SENT_FIN) == 0 || cep->snd_nxt == cep->snd_una)) {
 			error = send_segment(&sendalot, cep, doff, win, (uint_t)len, flags);
 			continue;
 			}
@@ -809,7 +811,7 @@ tcp_output (T_TCP_CEP *cep)
 		 *  持続タイマを設定する。
 		 */
 		if (cep->swbuf_count && cep->timer[TCP_TIM_REXMT  ] == 0 &&
-		                        cep->timer[TCP_TIM_PERSIST] == 0) {
+								cep->timer[TCP_TIM_PERSIST] == 0) {
 			cep->rxtshift = 0;
 			tcp_set_persist_timer(cep);
 			break;
@@ -827,7 +829,7 @@ tcp_output (T_TCP_CEP *cep)
 static void
 tcptsk_alloc_swbufq (T_TCP_CEP *cep)
 {
- 	ER	error;
+	ER	error;
 	uint_t	win;
 
 	/*
@@ -861,11 +863,11 @@ tcptsk_alloc_swbufq (T_TCP_CEP *cep)
 #endif	/* of #ifdef TCP_CFG_NON_BLOCKING */
 
 		if ((error = tcpn_get_segment(&cep->swbufq, cep, 0,
-		                             (uint_t)TCP_CFG_SWBUF_CSAVE_MIN_SIZE,
-		                             (uint_t)TCP_CFG_SWBUF_CSAVE_MAX_SIZE,
-		                             (ATR)(NBA_SEARCH_DESCENT |
-		                                   NBA_RESERVE_TCP    |
-		                                   (GET_TCP_CEPID(cep) & NBA_ID_MASK)), TMO_POL)) != E_OK) {
+									 (uint_t)TCP_CFG_SWBUF_CSAVE_MIN_SIZE,
+									 (uint_t)TCP_CFG_SWBUF_CSAVE_MAX_SIZE,
+									 (ATR)(NBA_SEARCH_DESCENT |
+										   NBA_RESERVE_TCP    |
+										   (GET_TCP_CEPID(cep) & NBA_ID_MASK)), TMO_POL)) != E_OK) {
 
 			/* ネットワークバッファを予約する。*/
 			cep->flags = (cep->flags & ~TCP_CEP_FLG_WBCS_MASK) | TCP_CEP_FLG_WBCS_NBUF_PEND;
@@ -908,7 +910,7 @@ tcptsk_alloc_swbufq (T_TCP_CEP *cep)
 #ifdef TCP_CFG_EXTENTIONS
 
 				/* 送信緊急ポインタを設定する。*/
-			        if (cep->snd_nblk_tfn == TFN_TCP_SND_OOB)
+					if (cep->snd_nblk_tfn == TFN_TCP_SND_OOB)
 					cep->snd_up = cep->snd_una + len;
 
 #endif	/* of #ifdef TCP_CFG_EXTENTIONS */
@@ -979,7 +981,7 @@ tcp_output_task (intptr_t exinf)
 
 	T_TCP_CEP	*cep;
 	ID		tskid;
- 	int_t		ix, sel_ix;
+	int_t		ix, sel_ix;
 
 	get_tid(&tskid);
 	syslog(LOG_NOTICE, "[TCP OUTPUT:%d] started.", tskid);
@@ -1007,14 +1009,14 @@ tcp_output_task (intptr_t exinf)
 #ifdef TCP_CFG_SWBUF_CSAVE
 
 			if ((cep->flags & TCP_CEP_FLG_WBCS_NBUF_REQ) != 0 &&
-			    ((cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_FREE ||
-			     (cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_NBUF_RSVD)) {
+				((cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_FREE ||
+				 (cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_NBUF_RSVD)) {
 				tcptsk_alloc_swbufq(cep);
 				sel_ix = ix;
 				}
 
 			if ((cep->flags & TCP_CEP_FLG_WBCS_MASK) == TCP_CEP_FLG_WBCS_ACKED &&
-			    (cep->swbufq->flags & NB_FLG_NOREL_IFOUT) == 0) {
+				(cep->swbufq->flags & NB_FLG_NOREL_IFOUT) == 0) {
 				tcptsk_free_swbufq(cep);
 				sel_ix = ix;
 				}
@@ -1057,7 +1059,7 @@ tcp_output_task (intptr_t exinf)
 #ifdef TCP_CFG_NON_BLOCKING
 
 				if (cep->snd_nblk_tfn == TFN_TCP_CON_CEP && cep->myaddr.portno == TCP_PORTANY) {
-				 	ER	error;
+					ER	error;
 
 					/*
 					 *  tcp_con_cep のノンブロッキングコールで、
