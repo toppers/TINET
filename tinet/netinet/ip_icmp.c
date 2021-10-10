@@ -227,7 +227,10 @@ icmp_unreach (T_NET_BUF *input, uint_t ihoff)
 
 	ip4h   = (T_IP4_HDR*)GET_ICMP4_SDU(input, ihoff);
 	code  = GET_ICMP4_HDR(input, ihoff)->code;
-	error = code2error[code];
+	if (code < sizeof(code2error) / sizeof(code2error[0]))
+		error = code2error[code];
+	else
+		return;
 
 	/* 最終ヘッダが TCP/UDP のみ対応する。*/
 	if (ip4h->proto == IPPROTO_TCP || ip4h->proto == IPPROTO_UDP) {
