@@ -315,7 +315,8 @@ arp_lookup (T_IN4_ADDR addr, bool_t create)
 		 */
 		syslog(LOG_NOTICE, "[ARP] cache busy, size=%d", NUM_ARP_ENTRY);
 		min = 0xffff;
-		for (six = ix = NUM_ARP_ENTRY; ix -- > 0; )
+		six = NUM_ARP_ENTRY - 1;
+		for (ix = NUM_ARP_ENTRY; ix -- > 0; )
 			if (arp_cache[ix].expire < min) {
 				six = ix;
 				min = arp_cache[ix].expire;
