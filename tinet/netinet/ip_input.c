@@ -414,7 +414,7 @@ ip_input (T_NET_BUF *input)
 		}
 
 	/* データグラム長をチェックする。*/
-	if (ntohs(ip4h->len) > input->len - IF_HDR_SIZE) {
+	if ((hlen < IP4_HDR_SIZE) || (hlen > ntohs(ip4h->len)) || (ntohs(ip4h->len) > input->len - IF_HDR_SIZE)) {
 		NET_COUNT_IP4(net_count_ip4[NC_IP4_IN_ERR_SHORT], 1);
 		NET_COUNT_MIB(ip_stats.ipInHdrErrors, 1);
 		goto buf_rel;
