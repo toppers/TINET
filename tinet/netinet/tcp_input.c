@@ -1363,7 +1363,7 @@ tcp_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 
 	seglen  = input->len - *offp;				/* TCP のセグメント長 */
 
-	if (IN_CKSUM(input, IPPROTO_TCP, *offp, (uint_t)seglen) != 0) {
+	if (seglen < TCP_HDR_SIZE || IN_CKSUM(input, IPPROTO_TCP, *offp, (uint_t)seglen) != 0) {
 		NET_COUNT_TCP(net_count_tcp[NC_TCP_RECV_BAD_CKSUMS], 1);
 		goto drop;
 		}
