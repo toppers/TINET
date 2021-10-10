@@ -61,7 +61,7 @@
 #define TFN_TCP_GET_OPT		(-0x213)
 #define TFN_TCP_ALL		(0)
 
-#define TEV_TCP_RCV_OOB		(-0x201)
+#define TEV_TCP_RCV_OOB		(0x201)
 
 /* UDP 関係 */
 
@@ -74,7 +74,7 @@
 #define TFN_UDP_GET_OPT		(-0x227)
 #define TFN_UDP_ALL		(0)
 
-#define TEV_UDP_RCV_DAT		(-0x221)
+#define TEV_UDP_RCV_DAT		(0x221)
 
 /* 一般 */
 
@@ -138,6 +138,9 @@ extern ER	udp_set_opt (ID cepid, int_t optname, void *optval, int_t optlen);
 extern ER	udp_get_opt (ID cepid, int_t optname, void *optval, int_t optlen);
 extern ER	udp_cre_cep (ID cepid, T_UDP_CCEP *pk_ccep);
 
+extern ER	udp6_del_cep(ID cepid);
+extern ER	udp6_set_opt(ID cepid, int_t optname, void *optval, int_t optlen);
+extern ER	udp6_get_opt(ID cepid, int_t optname, void *optval, int_t optlen);
 extern ER	udp6_cre_cep (ID cepid, T_UDP6_CCEP *pk_ccep);
 
 #endif	/* of #ifndef _IN_ITRON_H_ */
