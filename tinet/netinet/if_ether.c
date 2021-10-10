@@ -171,7 +171,7 @@ in_arpinput (T_IF_ADDR *ifaddr, T_NET_BUF *input)
 
 #else	/* of #ifdef ARP_CFG_CALLBACK_DUPLICATED */
 
-		syslog(LOG_ERROR, "[ARP] IP address duplicated: %s",
+		syslog(LOG_WARNING, "[ARP] IP address duplicated: %s",
 			          ip2str(NULL, &ifp->in4_ifaddr.addr),
 			          mac2str(NULL, et_arph->shost));
 		taddr = saddr;
