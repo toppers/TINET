@@ -1363,6 +1363,10 @@ tcp_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 	NTOHS(tcph->sport);
 	NTOHS(tcph->dport);
 
+	/* SDU 長 より 緊急ポインタが大きい場合 */
+	if (tcph->urp > tcph->sum)
+		goto drop;
+
 find_cep:
 
 #if defined(NUM_TCP_TW_CEP_ENTRY) && NUM_TCP_TW_CEP_ENTRY > 0
