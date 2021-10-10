@@ -354,6 +354,9 @@ ip_remove_options (T_NET_BUF *nbuf)
 	iph  = GET_IP4_HDR(nbuf);
 	hdr_size = GET_IP4_HDR_SIZE(nbuf);
 
+	if (nbuf->len < IF_HDR_SIZE + iph->len)
+		return E_PAR;
+
 	if (hdr_size > IP4_HDR_SIZE) {
 		memmove((char *)iph + IP4_HDR_SIZE, GET_IP4_SDU(nbuf),
 		        (size_t)(iph->len - hdr_size));
