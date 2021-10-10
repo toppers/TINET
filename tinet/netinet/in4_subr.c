@@ -281,8 +281,11 @@ in4_get_datagram (T_NET_BUF **nbuf, uint_t len, uint_t maxlen,
 		(*nbuf)->len = (uint16_t)(IF_IP4_HDR_SIZE + len);
 
 	/* IP ヘッダを設定する。*/
-	if ((error = in4_set_header(*nbuf, len, dstaddr, srcaddr, proto, ttl)) != E_OK)
+	if ((error = in4_set_header(*nbuf, len, dstaddr, srcaddr, proto, ttl)) != E_OK) {
+		syscall(rel_net_buf(*nbuf));
+		*nbuf = NULL;
 		return error;
+		}
 
 	/* 4 オクテット境界までパディングで埋める。*/
 	if (align > len)
