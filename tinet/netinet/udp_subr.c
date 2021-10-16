@@ -144,7 +144,7 @@ static uint16_t udp_port_auto = UDP_PORT_FIRST_AUTO;	/* 自動割り当て番号
 #define UDP_ALLOC_PORT		udp6_alloc_port
 #define UDP_FIND_CEP		udp6_find_cep
 #define UDP_NOTIFY		udp6_notify
-#define TMAX_UDP_CEPID		tmax_udp6_cepid
+#define TMAX_UDP_CEPID		TNUM_UDP6_CEPID
 #define UDP_CEP			udp6_cep
 #define T_UDP_CEP		T_UDP6_CEP
 #define T_IPEP			T_IPV6EP
@@ -181,7 +181,7 @@ static uint16_t udp_port_auto = UDP_PORT_FIRST_AUTO;	/* 自動割り当て番号
 #define UDP_ALLOC_PORT		udp4_alloc_port
 #define UDP_FIND_CEP		udp4_find_cep
 #define UDP_NOTIFY		udp4_notify
-#define TMAX_UDP_CEPID		tmax_udp4_cepid
+#define TMAX_UDP_CEPID		TNUM_UDP4_CEPID
 #define T_UDP_CEP		T_UDP4_CEP
 #define UDP_CEP			udp4_cep
 #define T_IPEP			T_IPV4EP

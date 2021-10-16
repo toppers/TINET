@@ -181,7 +181,7 @@ udp_output_task (intptr_t exinf)
 
 #if defined(_IP6_CFG) && TNUM_UDP6_CEPID > 0
 
-		for (ix = tmax_udp6_cepid; ix -- > 0; ) {
+		for (ix = TNUM_UDP6_CEPID; ix -- > 0; ) {
 
 			if (udp6_cep[ix].flags & UDP_CEP_FLG_POST_OUTPUT) {
 				udp6_cep[ix].flags &= ~UDP_CEP_FLG_POST_OUTPUT;
@@ -193,7 +193,7 @@ udp_output_task (intptr_t exinf)
 
 #if defined(_IP4_CFG) && TNUM_UDP4_CEPID > 0
 
-		for (ix = tmax_udp4_cepid; ix -- > 0; ) {
+		for (ix = TNUM_UDP4_CEPID; ix -- > 0; ) {
 
 			if (udp4_cep[ix].flags & UDP_CEP_FLG_POST_OUTPUT) {
 				udp4_cep[ix].flags &= ~UDP_CEP_FLG_POST_OUTPUT;
