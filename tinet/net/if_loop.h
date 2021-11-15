@@ -85,6 +85,7 @@ typedef struct t_loop_addr { } T_LOOP_ADDR;
 #define T_IF_ADDR		T_LOOP_ADDR		/* インタフェースのアドレス	*/
 #define IF_HDR_ALIGN		4			/* ヘッダのアライン単位		*/
 #define IF_MTU			LOMTU			/* インタフェースの MTU		*/
+#define IF_MIN_LEN		64				/* インターフェースフレームの最短長		*/
 
 #define IF_OUTPUT(o,d,g,t)	looutput(o,t)		/* インタフェースの出力関数	*/
 #define IF_RAW_OUTPUT(o,t)	looutput(o,t)		/* インタフェースの出力関数、アドレス解決無し*/

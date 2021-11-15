@@ -74,8 +74,6 @@
 
 #include <kernel.h>
 #include <sil.h>
-#include <syssvc/serial.h>
-#include <syssvc/logtask.h>
 #include <t_syslog.h>
 #include "kernel_cfg.h"
 

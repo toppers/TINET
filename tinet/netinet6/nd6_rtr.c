@@ -1036,6 +1036,8 @@ nd6_defrtrlist_lookup (const T_IN6_ADDR *src)
 	return NULL;
 	}
 
+#endif	/* of #if NUM_ND6_DEF_RTR_ENTRY > 0 */
+
 /*
  *  nd6_router_lookup -- ルータのアドレスを返す。
  *
@@ -1044,11 +1046,18 @@ nd6_defrtrlist_lookup (const T_IN6_ADDR *src)
 const T_IN6_ADDR *
 nd6_router_lookup (void)
 {
+#if NUM_ND6_DEF_RTR_ENTRY > 0
+
 	if (def_router_count > 0)
 		return &nd6_def_router[0].addr;
 	else
 		return NULL;
+#else
+	return NULL;
+#endif	/* of #if NUM_ND6_DEF_RTR_ENTRY > 0 */
 	}
+
+#if NUM_ND6_DEF_RTR_ENTRY > 0
 
 /*
  *  nd6_defrtrlist_del -- ディフォルトルータ・リストからルータを削除する。
@@ -1392,7 +1401,7 @@ nd6_rtrsol_ctl (void)
 		}
 	}
 
-#endif	/* of #if NUM_ND6_RTR_SOL_RETRY > 0 */
+#endif	/* of #if NUM_ND6_DEF_RTR_ENTRY > 0 */
 
 /*
  *  nd6_onlink_prefix_lookup -- プレフィックスを探索する。
@@ -1401,6 +1410,7 @@ nd6_rtrsol_ctl (void)
 T_ND6_PREFIX *
 nd6_onlink_prefix_lookup (const T_IN6_ADDR *dst)
 {
+#if NUM_ND6_DEF_RTR_ENTRY > 0
 	SYSTIM		now;
 	T_ND6_PREFIX	*pr;
 	int_t		ix;
@@ -1431,7 +1441,7 @@ nd6_onlink_prefix_lookup (const T_IN6_ADDR *dst)
 			return pr;
 			}
 		}
-
+#endif	/* of #if NUM_ND6_DEF_RTR_ENTRY > 0 */
 	return NULL;
 	}
 

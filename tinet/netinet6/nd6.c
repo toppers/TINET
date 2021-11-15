@@ -118,6 +118,8 @@
 
 #ifdef _IP6_CFG
 
+#if NUM_ND6_CACHE_ENTRY > 0
+
 /*
  *  近隣キャッシュ
  */
@@ -142,6 +144,8 @@ nd6_free (T_LLINFO_ND6	*ln)
 		}
 	}
 
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
+
 /*
  *  nd6_timer -- 近隣探索管理タイマー
  */
@@ -149,6 +153,7 @@ nd6_free (T_LLINFO_ND6	*ln)
 void
 nd6_timer (void)
 {
+#if NUM_ND6_CACHE_ENTRY > 0
 	T_IFNET		*ifp = IF_GET_IFNET();
 	T_LLINFO_ND6	*ln;
 	SYSTIM		now;
@@ -261,7 +266,10 @@ nd6_timer (void)
 		nd6_reachable_time		= ND6_CALC_REACH_TIME(nd6_base_reachable_time);
 		}
 	timeout((callout_func)nd6_timer, NULL, ND6_TIMER_TMO);
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
 	}
+
+#if NUM_ND6_CACHE_ENTRY > 0
 
 /*
  *  nd6_get_cache -- 近隣キャッシュを獲得する。
@@ -273,6 +281,8 @@ nd6_get_cache (void)
 	return nd6_cache;
 	}
 
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
+
 /*
  *  nd6_ifattach -- 近隣探索の初期設定を行う。
  */
@@ -281,6 +291,8 @@ void
 nd6_ifattach (T_IFNET *ifp)
 {
 	}
+
+#if NUM_ND6_CACHE_ENTRY > 0
 
 /*
  *  nd6_output_hold -- 近隣探索キャッシュに保留されている
@@ -501,6 +513,8 @@ nd6_is_addr_neighbor (T_IFNET *ifp, const T_IN6_ADDR *addr)
 	return false;
 	}
 
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
+
 /*
  *  nd6_output -- 近隣探索の出力関数
  *
@@ -511,6 +525,7 @@ ER
 nd6_output (T_IFNET *ifp, T_NET_BUF *output, const T_IN6_ADDR *dst, T_LLINFO_ND6 *ln, TMO tmout)
 {
 	ER	error = E_OK;
+#if NUM_ND6_CACHE_ENTRY > 0
 	SYSTIM	now;
 
 	/*
@@ -614,9 +629,12 @@ nd6_output (T_IFNET *ifp, T_NET_BUF *output, const T_IN6_ADDR *dst, T_LLINFO_ND6
 	return error;
 
 err_ret:
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
 	syscall(rel_net_buf(output));
 	return error;
 	}
+
+#if NUM_ND6_CACHE_ENTRY > 0
 
 /*
  *  nd6_storelladdr -- 出力するネットワークインタフェースのアドレスを返す。
@@ -696,5 +714,7 @@ nd6_options (uint8_t *opt, void *nh, uint_t len)
 	opt[ND_OPT_OFF_ARRAY_IX(ND_OPT_PREFIX_INFO_COUNT)] = pi_count;
 	return error;
 	}
+
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
 
 #endif /* of #ifdef _IP6_CFG */

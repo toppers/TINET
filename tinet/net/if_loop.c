@@ -123,11 +123,27 @@ extern const char *itron_strerror (ER ercd);
 
 #if defined(_IP6_CFG)
 
+#if defined(_IP4_CFG)
+
+static T_IFNET loop_ifnet = {
+	NULL,			/* ネットワークインタフェースのソフトウェア情報	*/
+	{},			/* IPv6 アドレス情報				*/
+	{},			/* マルチキャスト IPv6 アドレス			*/
+	{
+		IPV4_ADDR_LOOPBACK,		/* IPv4 アドレス			*/
+		IPV4_ADDR_LOOPBACK_MASK,	/* サブネットマスク			*/
+		},
+	};
+
+#else
+
 static T_IFNET loop_ifnet = {
 	NULL,			/* ネットワークインタフェースのソフトウェア情報	*/
 	{},			/* IPv6 アドレス情報				*/
 	{},			/* マルチキャスト IPv6 アドレス			*/
 	};
+
+#endif
 
 #elif defined(_IP4_CFG)	/* of #if defined(_IP6_CFG) */
 
@@ -163,7 +179,7 @@ looutput (T_NET_BUF *output, TMO tmout)
 	NET_COUNT_LOOP(net_count_loop.out_octets,  output->len);
 	NET_COUNT_LOOP(net_count_loop.out_packets, 1);
 
-	if ((error = tsnd_dtq(DTQ_LOOP_OUTPUT, output, tmout)) != E_OK)
+	if ((error = tsnd_dtq(DTQ_LOOP_OUTPUT, (intptr_t)output, tmout)) != E_OK)
 		syslog(LOG_NOTICE, "[LOOP] drop error: %s", itron_strerror(error));
 	return error;
 	}
@@ -185,7 +201,7 @@ if_loop_output_task (intptr_t exinf)
 		if (rcv_dtq(DTQ_LOOP_OUTPUT, (intptr_t*)&output) == E_OK) {
 			NET_COUNT_LOOP(net_count_loop.in_octets,  output->len);
 			NET_COUNT_LOOP(net_count_loop.in_packets, 1);
-			if ((error = snd_dtq(DTQ_LOOP_INPUT, output)) != E_OK)
+			if ((error = snd_dtq(DTQ_LOOP_INPUT, (intptr_t)output)) != E_OK)
 				syslog(LOG_NOTICE, "[LOOP OUTPUT] drop error: %s", itron_strerror(error));
 			}
 		}
@@ -201,17 +217,25 @@ if_loop_input_task (intptr_t exinf)
 	T_NET_BUF	*input;
 	ID		tskid;
 
+	/* ローカルループバックインタフェース・出力タスクを起動する */
+	syscall(act_tsk(LOOP_OUTPUT_TASK));
+
+	/* ネットワークタイマタスクを起動する */
+	syscall(act_tsk(NET_TIMER_TASK));
+
 	get_tid(&tskid);
 	syslog(LOG_NOTICE, "[LOOP INPUT:%d] started.", tskid);
+
 	while (true) {
-		if (rcv_dtq(DTQ_LOOP_INPUT, (intptr_t)&input) == E_OK) {
+		if (rcv_dtq(DTQ_LOOP_INPUT, (intptr_t *)&input) == E_OK) {
 			NET_COUNT_LOOP(net_count_loop.in_octets,  input->len);
 			NET_COUNT_LOOP(net_count_loop.in_packets, 1);
 
 #if defined(_IP4_CFG)
 
 			/* IPv4 入力関数を呼び出す */
-			if (IP4_VHL_V(GET_IP4_HDR(input)->vhl) == IPV4_VERSION)
+			if ((input->len >= IF_IP4_HDR_SIZE)
+				&& IP4_VHL_V(GET_IP4_HDR(input)->vhl) == IPV4_VERSION)
 				ip_input(input);
 
 #endif	/* of #if defined(_IP4_CFG) */
@@ -219,7 +243,8 @@ if_loop_input_task (intptr_t exinf)
 #if defined(_IP6_CFG)
 
 			/* IPv6 入力関数を呼び出す */
-			if (IP6_VCF_V(ntohl(GET_IP6_HDR(input)->vcf)) == IPV6_VERSION)
+			else if ((input->len >= IF_IP6_HDR_SIZE)
+				&& IP6_VCF_V(ntohl(GET_IP6_HDR(input)->vcf)) == IPV6_VERSION)
 				ip6_input(input);
 
 #endif	/* of #if defined(_IP6_CFG) */

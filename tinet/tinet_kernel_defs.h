@@ -107,7 +107,11 @@ typedef int			bool_t;		/* 真偽値 */
 
 #elif defined(TARGET_KERNEL_ASP)
 
+#ifdef DEBUG
+#define syscall(api)		assert(api == E_OK)
+#else
 #define syscall(api)		(api)
+#endif
 
 #endif	/* of #if defined(TARGET_KERNEL_JSP) */
 

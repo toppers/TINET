@@ -110,6 +110,8 @@
 
 #ifdef _IP6_CFG
 
+#if NUM_ND6_CACHE_ENTRY > 0
+
 /*
  *  局所関数
  */
@@ -225,6 +227,8 @@ nd6_dad_timer (T_IN6_IFADDR *ifa)
 		}
 	}
 
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
+
 /*
  *  nd6_ns_input -- 近隣要請の入力処理。
  */
@@ -232,6 +236,8 @@ nd6_dad_timer (T_IN6_IFADDR *ifa)
 void
 nd6_ns_input (T_NET_BUF *input, uint_t off)
 {
+#if NUM_ND6_CACHE_ENTRY > 0
+
 	T_IFNET			*ifp = IF_GET_IFNET();
 	T_IP6_HDR		*ip6h;
 	T_NEIGHBOR_SOLICIT_HDR	*nsh;
@@ -351,9 +357,12 @@ free_ret:
 	return;
 
 err_ret:
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
 	NET_COUNT_ICMP6(net_count_nd6[NC_ICMP6_IN_ERR_PACKETS], 1);
 	syscall(rel_net_buf(input));
 	}
+
+#if NUM_ND6_CACHE_ENTRY > 0
 
 /*
  *  nd6_ns_output -- 近隣要請を出力する。
@@ -481,6 +490,8 @@ nd6_ns_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 	ip6_output(output, ipflags | IPV6_OUT_FLG_DAD, TMO_ND6_NS_OUTPUT);
 	}
 
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
+
 /*
  *  nd6_na_input -- 近隣通知の入力処理。
  */
@@ -488,6 +499,8 @@ nd6_ns_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 void
 nd6_na_input (T_NET_BUF *input, uint_t off)
 {
+#if NUM_ND6_CACHE_ENTRY > 0
+
 	T_IFNET			*ifp = IF_GET_IFNET();
 	T_IP6_HDR		*ip6h;
 	T_NEIGHBOR_ADVERT_HDR	*nah;
@@ -687,9 +700,12 @@ free_ret:
 	return;
 
 err_ret:
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
 	NET_COUNT_ICMP6(net_count_nd6[NC_ICMP6_IN_ERR_PACKETS], 1);
 	syscall(rel_net_buf(input));
 	}
+
+#if NUM_ND6_CACHE_ENTRY > 0
 
 /*
  *  nd6_na_output -- 近隣通知を出力する。
@@ -792,6 +808,8 @@ nd6_na_output (T_IFNET *ifp, const T_IN6_ADDR *daddr,
 	NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpOutNeighborAdvertisements, 1);
 	ip6_output(output, ipflags, TMO_ND6_NS_OUTPUT);
 	}
+
+#endif /* of #if NUM_ND6_CACHE_ENTRY > 0 */
 
 /*
  *  nd6_dad_start -- 重複アドレス検出 (DAD) を開始する。
