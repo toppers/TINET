@@ -816,7 +816,7 @@ extern uint_t tcp_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp);
 extern void tcp_init (void);
 extern void tcp_init_iss (void);
 extern T_TCP_CEP *tcp_close (T_TCP_CEP *cep);
-extern T_TCP_CEP *tcp_drop  (T_TCP_CEP *cep, ER errno);
+extern T_TCP_CEP *tcp_drop  (T_TCP_CEP *cep, ER error);
 extern void tcp_respond (T_NET_BUF *nbuf, T_TCP_CEP *cep,
                          T_TCP_SEQ ack, T_TCP_SEQ seq, uint_t rbfree, uint8_t flags);
 extern ER tcp_get_segment (T_NET_BUF **nbuf, T_TCP_CEP *cep,

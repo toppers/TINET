@@ -803,7 +803,7 @@ tcp_close (T_TCP_CEP *cep)
  */
 
 T_TCP_CEP *
-tcp_drop (T_TCP_CEP *cep, ER errno)
+tcp_drop (T_TCP_CEP *cep, ER error)
 {
 #ifdef SUPPORT_MIB
 
@@ -813,7 +813,7 @@ tcp_drop (T_TCP_CEP *cep, ER errno)
 
 #endif	/* of #ifdef SUPPORT_MIB */
 
-	cep->error = errno;
+	cep->error = error;
 	if (TCP_FSM_HAVE_RCVD_SYN(cep->fsm_state)) {
 		cep->fsm_state = TCP_FSM_CLOSED;
 
