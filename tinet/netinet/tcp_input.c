@@ -327,7 +327,9 @@ reassemble (T_NET_BUF *input, T_TCP_CEP *cep, uint_t thoff, uint8_t flags)
 #endif/* of #ifdef TCP_CFG_DELAY_ACK */
 
 		qhdr = GET_TCP_Q_HDR(input, thoff);
-
+#ifdef _M_X64
+		qhdr->seq = tcph->seq;
+#endif
 		/*  TCP ヘッダの位置を保存する。*/
 		SET_IP_TCP_Q_HDR_OFFSET(input, thoff);
 

@@ -463,9 +463,10 @@ typedef struct t_tcp_twcep {
  */
 
 typedef struct t_tcp_q_hdr {
+#ifndef _M_X64
 	uint16_t	sport;		/* 送信元ポート番号			*/
 	uint16_t	dport;		/* 宛先ポート番号			*/
-
+#endif
 	uint32_t	seq;		/* SEQ 番号				*/
 
 	T_NET_BUF 	*next;		/* 次のセグメント、元は ACK 番号(ack)	*/
@@ -476,7 +477,7 @@ typedef struct t_tcp_q_hdr {
 
 	uint16_t	slen;		/* SDU 長、元はチェックサム(sum)	*/
 	uint16_t	urp;		/* 緊急ポインタ（SDU 長補正）		*/
-	} T_TCP_Q_HDR;
+	} __attribute__((packed))T_TCP_Q_HDR;
 
 #define GET_TCP_Q_HDR(nbuf,thoff)	((T_TCP_Q_HDR*)((uint8_t*)((nbuf)->buf) + thoff))
 
