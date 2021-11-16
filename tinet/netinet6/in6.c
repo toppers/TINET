@@ -204,7 +204,7 @@ in6_ifainit (void)
 
 	for (ix = NUM_IN6_IFADDR_ENTRY; ix -- > 0; ) {
 		ia = &ifp->in6_ifaddrs[ix];
-		memset(ia, sizeof(T_IN6_IFADDR), 0);
+		memset(ia, 0, sizeof(T_IN6_IFADDR));
 		ia->router_index = IN6_RTR_IX_UNREACH;
 		ia->prefix_index = ND6_PREFIX_IX_INVALID;
 		}
