@@ -1645,7 +1645,7 @@ find_cep:
 			 *  SDU を前に詰める。
 			 */
 			if (todrop < tcph->sum) {		/* tcph->sum は TCP の SDU 長 */
-				memcpy(GET_TCP_SDU(input, *offp),
+				memmove(GET_TCP_SDU(input, *offp),
 				       GET_TCP_SDU(input, *offp) + todrop, (size_t)(tcph->sum - todrop));
 				}
 
