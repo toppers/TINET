@@ -222,7 +222,7 @@ frag6_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 #endif	/* #ifdef IP6_CFG_FRAGMENT */
 
 	/* ネットワークバッファの残りの長さをチェックする。*/
-	if (input->len - off < sizeof(T_IP6_FRAG_HDR))
+	if (input->len < off + sizeof(T_IP6_FRAG_HDR))
 		goto buf_rel;
 
 	/* 
