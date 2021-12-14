@@ -669,7 +669,12 @@ nd6_options (uint8_t *opt, void *nh, uint_t len)
 	opth = (T_ND_OPT_HDR *)nh;
 	memset(opt, 0, ND_OPT_OFF_ARRAY_SIZE);
 
-	while (error == E_OK && ((uint8_t *)opth - (uint8_t *)nh) < (256 - 8) && len > 0) {
+	while (error == E_OK && ((uint8_t *)opth - (uint8_t *)nh) < (256 - 8)) {
+		/* オプション長が全体サイズより大きい時は、不正なオプションとして処理する。*/
+		if (len < (opth->len << 3)) {
+			error = E_PAR;
+			break;
+		}
 
 		/* オプション長が 0 の時は、不正なオプションとして処理する。*/
 		if (opth->len == 0) {
