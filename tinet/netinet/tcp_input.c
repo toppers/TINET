@@ -1356,7 +1356,7 @@ tcp_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 	NET_COUNT_MIB(tcp_stats.tcpInSegs, 1);
 
 	/* ヘッダ長をチェックする。*/
-	if (input->len < IF_IP_TCP_HDR_SIZE(input)) {
+	if (input->len < *offp + TCP_HDR_SIZE) {
 		NET_COUNT_TCP(net_count_tcp[NC_TCP_RECV_BAD_HEADERS], 1);
 		goto drop;
 		}
