@@ -235,11 +235,21 @@ ip6_hopopts_input (T_NET_BUF *input, uint_t *offp, uint_t *nextp)
 {
 	T_IP6_HBH_HDR	*hbh;
 	ER_UINT		optlen;
-	uint_t		len;
+	int_t		len;
+	uint_t		off = *offp;
 	uint8_t		*opt;
 
-	hbh    = (T_IP6_HBH_HDR *)(input->buf + *offp);
+	/* ネットワークバッファの残りの長さをチェックする。*/
+	if (input->len < off + sizeof(T_IP6_HBH_HDR))
+		return IP6_OPT_RET_ERR;
+
+	hbh    = (T_IP6_HBH_HDR *)(input->buf + off);
 	len    = (hbh->len + 1) << 3;
+
+	/* 終点オプションヘッダの長さをチェックする。*/
+	if (input->len < off + sizeof(T_IP6_HBH_HDR) + len)
+		return IP6_OPT_RET_ERR;
+
 	*nextp = *offp - IF_HDR_SIZE + offsetof(T_IP6_HBH_HDR, next);
 	*offp += len;
 	opt    = (uint8_t *)hbh + sizeof(T_IP6_HBH_HDR);
