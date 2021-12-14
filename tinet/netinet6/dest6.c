@@ -112,11 +112,12 @@ dest6_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 	T_NET_BUF	*input = *inputp;
 	T_IP6_DEST_HDR	*desth;
 	ER_UINT		optlen;
-	uint_t		len, off = *offp;
+	int_t		len;
+	uint_t		off = *offp;
 	uint8_t		*opt;
 
 	/* ネットワークバッファの残りの長さをチェックする。*/
-	if (input->len - off < sizeof(T_IP6_DEST_HDR))
+	if (input->len < off + sizeof(T_IP6_DEST_HDR))
 		goto buf_rel;
 
 	desth  = (T_IP6_DEST_HDR *)(input->buf + off);
