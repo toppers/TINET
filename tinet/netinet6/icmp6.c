@@ -475,13 +475,13 @@ icmp6_input (T_NET_BUF **inputp, uint_t *offp, uint_t *nextp)
 	NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpInMsgs, 1);
 
 	/* ICMP6 ヘッダの長さをチェックする。*/
-	len  = input->len - off;
-	if (len < ICMP6_HDR_SIZE) {
+	if (input->len < off + ICMP6_HDR_SIZE) {
 		NET_COUNT_ICMP6(net_count_icmp6[NC_ICMP6_IN_ERR_PACKETS], 1);
 		NET_COUNT_MIB(icmp6_ifstat.ipv6IfIcmpInErrors, 1);
 		goto buf_rel;
 		}
 
+	len = input->len - off;
 	ip6h   = GET_IP6_HDR(input);
 	icmp6h = GET_ICMP6_HDR(input, off);
 
