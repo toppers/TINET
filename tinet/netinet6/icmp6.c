@@ -652,7 +652,7 @@ icmp6_error (T_NET_BUF *input, uint8_t type, uint8_t code, uint32_t param)
 	if (off >= 0 && next == IPPROTO_ICMPV6) {
 		T_ICMP6_HDR	*icmp6h;
 
-		if (input->len - off < ICMP6_HDR_SIZE)
+		if (input->len < off + ICMP6_HDR_SIZE)
 			goto buf_rel;
 
 		icmp6h = GET_ICMP6_HDR(input, off);
