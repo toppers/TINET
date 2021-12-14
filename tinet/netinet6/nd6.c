@@ -342,7 +342,7 @@ T_LLINFO_ND6 *
 nd6_lookup (const T_IN6_ADDR *addr, bool_t create)
 {
 	SYSTIM	min = 0xffffffff;
-	int_t	ix, fix = -1, mix = -1;
+	int_t	ix, fix = -1, mix = NUM_ND6_CACHE_ENTRY - 1;
 
 	for (ix = NUM_ND6_CACHE_ENTRY; ix -- > 0; ) {
 		if (nd6_cache[ix].state == 0) {
