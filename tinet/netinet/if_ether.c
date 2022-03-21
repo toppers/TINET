@@ -114,6 +114,15 @@
 
 static T_ARP_ENTRY arp_cache[NUM_ARP_ENTRY];
 
+#ifdef TINET_ARP_HOLD_QUEUE
+typedef struct arp_entry_hold {
+	QUEUE queue;
+	T_NET_BUF *buf;
+} T_ARP_ENTRY_HOLD;
+
+static T_ARP_ENTRY_HOLD arp_cache_hold[NUM_ARP_ENTRY];
+#endif
+
 /*
  *  関数
  */
@@ -204,6 +213,7 @@ in_arpinput (T_IF_ADDR *ifaddr, T_NET_BUF *input)
 	/*
 	 *  送信がペンデングされているフレームがあれば送信する。
 	 */
+#ifndef TINET_ARP_HOLD_QUEUE
 	if (ent->hold) {
 
 		/* フレームの Ethernet ヘッダを設定する。*/
@@ -219,6 +229,28 @@ in_arpinput (T_IF_ADDR *ifaddr, T_NET_BUF *input)
 		}
 	else
 		syscall(sig_sem(SEM_ARP_CACHE_LOCK));
+#else
+	if (!queue_empty(&ent->holds)) {
+		do {
+			T_ARP_ENTRY_HOLD *hold = (T_ARP_ENTRY_HOLD *)queue_delete_next(&ent->holds);
+
+			/* フレームの Ethernet ヘッダを設定する。*/
+			memcpy(GET_ETHER_HDR(hold)->dhost, ent->mac_addr, ETHER_ADDR_LEN);
+
+			pending = hold->buf;
+			hold->buf = NULL;
+			syscall(sig_sem(SEM_ARP_CACHE_LOCK));
+
+			/* ペンディングされているフレームを送信する。*/
+			IF_RAW_OUTPUT(pending, TMO_FEVR);
+
+			syscall(wai_sem(SEM_ARP_CACHE_LOCK));
+
+			} while (!queue_empty(&ent->holds));
+		}
+	else
+		syscall(sig_sem(SEM_ARP_CACHE_LOCK));
+#endif
 
 reply:
 
@@ -268,10 +300,21 @@ arp_timer (void *ignore)
 			arp_cache[ix].expire -= ARP_TIMER_TMO;
 			if (arp_cache[ix].expire == 0) {
 				/* 送信がペンデングされているフレームがあれば捨てる。*/
+#ifndef TINET_ARP_HOLD_QUEUE
 				if (arp_cache[ix].hold) {
 					NET_COUNT_IP4(net_count_ip4[NC_IP4_OUT_ERR_PACKETS], 1);
 					syscall(rel_net_buf(arp_cache[ix].hold));
 					}
+#else
+				while (!queue_empty(&arp_cache[ix].holds)) {
+					T_ARP_ENTRY_HOLD *hold = (T_ARP_ENTRY_HOLD *)queue_delete_next(&arp_cache[ix].holds);
+					T_NET_BUF *pending = hold->buf;
+					hold->buf = NULL;
+
+					NET_COUNT_IP4(net_count_ip4[NC_IP4_OUT_ERR_PACKETS], 1);
+					syscall(rel_net_buf(pending));
+					}
+#endif
 				memset(&arp_cache[ix], 0, sizeof(T_ARP_ENTRY));
 				}
 			}
@@ -279,6 +322,16 @@ arp_timer (void *ignore)
 
 	syscall(sig_sem(SEM_ARP_CACHE_LOCK));
 	timeout(arp_timer, NULL, ARP_TIMER_TMO);
+	}
+
+static bool_t
+has_hold(T_ARP_ENTRY *ent)
+{
+#ifndef TINET_ARP_HOLD_QUEUE
+	return ent->hold != 0;
+#else
+	return !queue_empty(&ent->holds);
+#endif
 	}
 
 /*
@@ -294,7 +347,7 @@ arp_lookup (T_IN4_ADDR addr, bool_t create)
 	uint16_t	min;
 
 	for (ix = NUM_ARP_ENTRY; ix -- > 0; ) {
-		if ((arp_cache[ix].expire || arp_cache[ix].hold != 0) && arp_cache[ix].ip_addr == addr)
+		if ((arp_cache[ix].expire || has_hold(&arp_cache[ix])) && arp_cache[ix].ip_addr == addr)
 			return &arp_cache[ix];
 		}
 
@@ -303,7 +356,7 @@ arp_lookup (T_IN4_ADDR addr, bool_t create)
 
 		/* まず、空きがあれば、その空きを利用する。*/
 		for (ix = NUM_ARP_ENTRY; ix -- > 0; ) {
-			if (arp_cache[ix].expire == 0 && arp_cache[ix].hold == 0) {
+			if (arp_cache[ix].expire == 0 && !has_hold(&arp_cache[ix])) {
 				arp_cache[ix].ip_addr = addr;
 				return &arp_cache[ix];
 				}
@@ -439,6 +492,10 @@ arp_resolve (T_IF_ADDR *ifaddr, T_NET_BUF *output, T_IN4_ADDR gw)
 	T_ARP_ENTRY	*ent;
 	T_ETHER_HDR	*eth;
 	T_IFNET		*ifp = IF_GET_IFNET();
+#ifdef TINET_ARP_HOLD_QUEUE
+	int_t		ix;
+	T_ARP_ENTRY_HOLD *hold;
+#endif
 
 	eth = GET_ETHER_HDR(output);
 
@@ -463,22 +520,56 @@ arp_resolve (T_IF_ADDR *ifaddr, T_NET_BUF *output, T_IN4_ADDR gw)
 		return true;
 		}
 	else {
+#ifndef TINET_ARP_HOLD_QUEUE
 	 	/* 送信がペンデングされているフレームがあれば捨てる。*/
 		if (ent->hold) {
 			NET_COUNT_IP4(net_count_ip4[NC_IP4_OUT_ERR_PACKETS], 1);
 			syscall(rel_net_buf(ent->hold));
 			}
-
+#endif
 		/*
 		 *  送信をペンディングする。
 		 *  IF でネットワークバッファを開放しないフラグが設定されているときは、
 		 *  送信をペンディングしない。
 		 */
-		if ((output->flags & NB_FLG_NOREL_IFOUT) == 0)
+		if ((output->flags & NB_FLG_NOREL_IFOUT) == 0) {
+#ifndef TINET_ARP_HOLD_QUEUE
 			ent->hold = output;
+#else
+			hold = NULL;
+			for (ix = NUM_ARP_ENTRY; ix-- > 0; ) {
+				if (arp_cache_hold[ix].buf == NULL) {
+					hold = &arp_cache_hold[ix];
+					break;
+					}
+				}
+			if (hold == NULL) {
+				if (!queue_empty(&ent->holds)) {
+					hold = (T_ARP_ENTRY_HOLD *)queue_delete_next(&ent->holds);
+					T_NET_BUF *pending = hold->buf;
+					hold->buf = NULL;
+					NET_COUNT_IP4(net_count_ip4[NC_IP4_OUT_ERR_PACKETS], 1);
+					syscall(rel_net_buf(pending));
+					}
+				}
+			if (hold != NULL) {
+				queue_initialize(&hold->queue);
+				hold->buf = output;
+				queue_insert_next(&ent->holds, &hold->queue);
+				}
+			else {
+				NET_COUNT_IP4(net_count_ip4[NC_IP4_OUT_ERR_PACKETS], 1);
+				syscall(rel_net_buf(output));
+				syscall(sig_sem(SEM_ARP_CACHE_LOCK));
+				return false;
+				}
+#endif
+			}
 		else {
 			output->flags &= (uint8_t)~NB_FLG_NOREL_IFOUT;
+#ifndef TINET_ARP_HOLD_QUEUE
 			ent->hold = NULL;
+#endif
 			}
 		syscall(sig_sem(SEM_ARP_CACHE_LOCK));
 
@@ -495,6 +586,13 @@ arp_resolve (T_IF_ADDR *ifaddr, T_NET_BUF *output, T_IN4_ADDR gw)
 void
 arp_init (void)
 {
+#ifdef TINET_ARP_HOLD_QUEUE
+	int_t		ix;
+
+	for (ix = NUM_ARP_ENTRY; ix-- > 0; ) {
+		queue_initialize(&arp_cache[ix].holds);
+		}
+#endif
 	timeout(arp_timer, NULL, ARP_TIMER_TMO);
 	}
 

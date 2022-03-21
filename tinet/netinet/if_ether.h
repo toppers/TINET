@@ -72,6 +72,10 @@
 
 #ifdef SUPPORT_ETHER
 
+#ifdef TINET_ARP_HOLD_QUEUE
+#include <queue.h>
+#endif
+
 /*
  *  Ethernet Address Resolution Protocol.
  *
@@ -95,7 +99,11 @@ typedef struct t_ether_arp_hdr {
  */
 
 typedef struct arp_entry {
+#ifndef TINET_ARP_HOLD_QUEUE
 	T_NET_BUF	*hold;		/* ARP の解決待ち出力フレーム	*/
+#else
+	QUEUE holds;			/* ARP の解決待ち出力フレーム	*/
+#endif
 	T_IN4_ADDR	ip_addr;	/* IP アドレス			*/
 	uint16_t	expire;		/* 破棄までの時間、0 なら未使用	*/
 	uint8_t		mac_addr[ETHER_ADDR_LEN];	/* MAC アドレス	*/
