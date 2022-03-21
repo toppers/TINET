@@ -294,7 +294,7 @@ arp_lookup (T_IN4_ADDR addr, bool_t create)
 	uint16_t	min;
 
 	for (ix = NUM_ARP_ENTRY; ix -- > 0; ) {
-		if (arp_cache[ix].expire && arp_cache[ix].ip_addr == addr)
+		if ((arp_cache[ix].expire || arp_cache[ix].hold != 0) && arp_cache[ix].ip_addr == addr)
 			return &arp_cache[ix];
 		}
 
@@ -303,7 +303,7 @@ arp_lookup (T_IN4_ADDR addr, bool_t create)
 
 		/* まず、空きがあれば、その空きを利用する。*/
 		for (ix = NUM_ARP_ENTRY; ix -- > 0; ) {
-			if (arp_cache[ix].expire == 0) {
+			if (arp_cache[ix].expire == 0 && arp_cache[ix].hold == 0) {
 				arp_cache[ix].ip_addr = addr;
 				return &arp_cache[ix];
 				}
